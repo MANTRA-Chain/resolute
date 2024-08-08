@@ -1,5 +1,9 @@
 [
   {
+    "chainId": "mantrachain-devnet-9001",
+    "restURIs": ["https://dev-chain.mantra.finance:1317"]
+  },
+  {
     "chainId": "passage-2",
     "restURIs": [
       "https://rest-passage.ecostake.com",
