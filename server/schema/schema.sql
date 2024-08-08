@@ -52,7 +52,7 @@ SET default_table_access_method = heap;
 CREATE TABLE public.multisig_accounts (
     address character varying(50) NOT NULL,
     threshold integer NOT NULL,
-    chain_id character varying(20) NOT NULL,
+    chain_id character varying(50) NOT NULL, -- To support our long chain ID
     pubkey_type character varying(50) NOT NULL,
     name character varying(100) NOT NULL,
     created_by character varying(50) NOT NULL,
