@@ -39,6 +39,7 @@ func ParseConfig() (Config, error) {
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./")
 	viper.AddConfigPath("../")
+	viper.AddConfigPath("/home/mantra-dev/resolute/server/build/")
 
 	cfg := Config{}
 
