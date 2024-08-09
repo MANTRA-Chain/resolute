@@ -4,6 +4,7 @@ namespace: mantrachain-canary-devnet-v1
 
 resources:
   - resources/server-config.yaml
+  - resources/psql-init.yaml
 
 helmCharts:
 #
@@ -27,7 +28,7 @@ helmCharts:
       image:
         repository: ghcr.io/mantra-finance/resolute-frontend
         pullPolicy: IfNotPresent
-        tag: "442a18b"
+        tag: "2b88ce5"
       annotations:
         argocd.argoproj.io/sync-wave: "2"
       service:
@@ -75,7 +76,7 @@ helmCharts:
       image:
         repository: ghcr.io/mantra-finance/resolute-server
         pullPolicy: IfNotPresent
-        tag: "442a18b"
+        tag: "2b88ce5"
       annotations:
         argocd.argoproj.io/sync-wave: "2"
       service:
@@ -135,3 +136,7 @@ helmCharts:
           database: resolute
           username: resolute
           password: heartland-ocean-praetor-neat
+
+    primary:
+      initdb:
+        scriptsConfigMap: postgresql-init-script
