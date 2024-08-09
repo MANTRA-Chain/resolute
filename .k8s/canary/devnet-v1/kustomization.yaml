@@ -1,0 +1,134 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: mantrachain-canary-devnet-v1
+
+helmCharts:
+#
+# RESOLUTE FRONTEND
+#
+- name: generic-helm-chart
+  repo: https://aaronforce1.github.io/generic-helm-chart
+  version: 0.4.2
+  releaseName: resolute-frontend-devnet-v1
+  valuesFile: './values.yaml'
+  valuesInline:
+    nameOverride: resolute-frontend-devnet-v1
+    fullnameOverride: resolute-frontend-devnet-v1
+    service:
+      port:
+        - port: 3000
+          targetPort: 3000
+          protocol: TCP
+          name: http
+    deployment:
+      image:
+        repository: ghcr.io/mantra-finance/resolute-frontend
+        pullPolicy: IfNotPresent
+        tag: "442a18b"
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+      service:
+        port:
+          - containerPort: 3000
+            protocol: TCP
+            name: http
+    ingress:
+      - enabled: true
+        name: frontend
+        className: nginx
+        hosts:
+          - host: resolute.v1.devnet.canary.mantrachain.dev
+            http:
+              paths:
+                - backend:
+                    service:
+                      name: resolute-frontend-devnet-v1
+                      port:
+                        number: 3000
+                  path: /
+                  pathType: Prefix
+        tls:
+          - hosts:
+              - resolute.v1.devnet.canary.mantrachain.dev
+            secretName: canary.mantrachain.dev-wildcard-tls-secret
+#
+# RESOLUTE SERVER
+#
+- name: generic-helm-chart
+  repo: https://aaronforce1.github.io/generic-helm-chart
+  version: 0.4.2
+  releaseName: resolute-server-devnet-v1
+  valuesFile: './values.yaml'
+  valuesInline:
+    nameOverride: resolute-server-devnet-v1
+    fullnameOverride: resolute-server-devnet-v1
+    service:
+      port:
+        - port: 8000
+          targetPort: 1323
+          protocol: TCP
+          name: http
+    deployment:
+      image:
+        repository: ghcr.io/mantra-finance/resolute-frontend
+        pullPolicy: IfNotPresent
+        tag: "442a18b"
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+      service:
+        port:
+          - containerPort: 1323
+            protocol: TCP
+            name: http
+      
+      volumeMounts:
+      - name: resolute-server-devnet-v1-config
+        mountPath: /app/config.yaml
+        subPath: config.yaml
+      
+      volumes:
+      - name: resolute-server-devnet-v1-config
+        configMap:
+          name: resolute-server-devnet-v1-config
+          defaultMode: 420
+      
+    ingress:
+      - enabled: true
+        name: api
+        className: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/rewrite-target: /$2
+          nginx.ingress.kubernetes.io/use-regex: 'true'
+        hosts:
+          - host: resolute.v1.devnet.canary.mantrachain.dev
+            http:
+              paths:
+                - backend:
+                    service:
+                      name: resolute-frontend-devnet-v1
+                      port:
+                        number: 3000
+                  path: /api(/|$)(.*)
+                  pathType: Prefix
+        tls:
+          - hosts:
+              - resolute.v1.devnet.canary.mantrachain.dev
+            secretName: canary.mantrachain.dev-wildcard-tls-secret
+#
+# Higher Environments: Database should run as cloud-managed service
+#
+- name: postgresql
+  repo: https://charts.bitnami.com/bitnami
+  version: 13.3.1
+  releaseName: postgresql
+  namespace: mantrachain-canary-devnet-v1
+  valuesInline:
+    commonAnnotations:
+      argocd.argoproj.io/sync-wave: "-1"
+
+    global:
+      postgresql:
+        auth:
+          database: resolute
+          username: resolute
+          password: heartland-ocean-praetor-neat
