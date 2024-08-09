@@ -73,7 +73,7 @@ helmCharts:
           name: http
     deployment:
       image:
-        repository: ghcr.io/mantra-finance/resolute-frontend
+        repository: ghcr.io/mantra-finance/resolute-server
         pullPolicy: IfNotPresent
         tag: "442a18b"
       annotations:
@@ -108,7 +108,7 @@ helmCharts:
               paths:
                 - backend:
                     service:
-                      name: resolute-frontend-devnet-v1
+                      name: resolute-server-devnet-v1
                       port:
                         number: 3000
                   path: /api(/|$)(.*)
