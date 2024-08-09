@@ -59,6 +59,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha,enable=true,priority=100,prefix=,suffix=,format=short
+            type=raw,value=latest
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
