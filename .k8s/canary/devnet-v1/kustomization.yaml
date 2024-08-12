@@ -28,7 +28,7 @@ helmCharts:
       image:
         repository: ghcr.io/mantra-finance/resolute-frontend
         pullPolicy: IfNotPresent
-        tag: "2b88ce5"
+        tag: "latest"
       annotations:
         argocd.argoproj.io/sync-wave: "2"
       service:
@@ -76,7 +76,7 @@ helmCharts:
       image:
         repository: ghcr.io/mantra-finance/resolute-server
         pullPolicy: IfNotPresent
-        tag: "2b88ce5"
+        tag: "latest"
       annotations:
         argocd.argoproj.io/sync-wave: "2"
       service:
@@ -89,6 +89,9 @@ helmCharts:
       - name: resolute-server-devnet-v1-config
         mountPath: /app/config.yaml
         subPath: config.yaml
+      - name: resolute-server-devnet-v1-config
+        mountPath: /app/networks.json
+        subPath: networks.json
       
       volumes:
       - name: resolute-server-devnet-v1-config
