@@ -7,7 +7,7 @@ data:
     active: "dev"
 
     # don't remove this prod config as it is used for global config
-    prod:
+    production:
       api:
         port: 1323
       coingecko:
