@@ -6,6 +6,13 @@ data:
   config.yaml: |
     active: "dev"
 
+    # don't remove this prod config as it is used for global config
+    prod:
+      api:
+        port: 1323
+      coingecko:
+        uri: "https://api.coingecko.com/api/v3/"
+
     dev:
       database:
         host: "postgresql"
@@ -13,10 +20,7 @@ data:
         user: "resolute"
         password: "heartland-ocean-praetor-neat"
         name: "resolute"
-      api:
-        port: 1323
-      coingecko:
-        uri: "https://api.coingecko.com/api/v3/"
+
   networks.json: |
     [
       {
