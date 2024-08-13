@@ -114,7 +114,7 @@ helmCharts:
                     service:
                       name: resolute-server-devnet-v1
                       port:
-                        number: 3000
+                        number: 8000
                   path: /api(/|$)(.*)
                   pathType: Prefix
         tls:
