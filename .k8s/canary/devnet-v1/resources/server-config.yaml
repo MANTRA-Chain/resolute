@@ -24,8 +24,8 @@ data:
   networks.json: |
     [
       {
-        "chainId": "mantrachain-devnet-9001",
-        "restURIs": ["https://dev-chain.mantra.finance:1317"]
+        "chainId": "mantra-devnet-1",
+        "restURIs": ["https://rest-dev.canary.mantrachain.dev:443"]
       },
       {
         "chainId": "passage-2",
