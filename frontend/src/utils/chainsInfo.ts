@@ -23,7 +23,7 @@ export const networks: Network[] = [
     explorerTxHashEndpoint: 'https://atomscan.com/agoric/transactions/',
     config: {
       chainId: 'mantra-devnet-1',
-      chainName: 'MANTRA Chain DevNet',
+      chainName: 'MANTRAChainDevNet',
       rest: 'https://rest-dev.canary.mantrachain.dev:443',
       rpc: 'wss://rpc-dev.canary.mantrachain.dev:443',
       restURIs: ['https://rest-dev.canary.mantrachain.dev:443'],
@@ -45,107 +45,107 @@ export const networks: Network[] = [
         {
           coinDenom: 'ATOM',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/atom`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'USDC',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/usdc`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'MANTRA',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/mantra`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'AKT',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/akt`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'WETH',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/weth`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'MATIC',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/matic`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'ALT',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/alt`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'DOT',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/dot`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'DOGE',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/dogecoin`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'ZXC',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/zxc`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'KUS',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/kusama`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'VBN',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/vbn`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'USDT',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/usdt`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'PEPE',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/pepe`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'JUNO',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/juno`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'mTesla',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/mtesla`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'mApple',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/mapple`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'mpalmjumeirah',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/mpalmjumeirah`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'mgoldetf',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/mgoldetf`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'mBF2',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/mbf2`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
         {
           coinDenom: 'mblackstone',
           coinMinimalDenom: `factory/mantra1axznhnm82lah8qqvp9hxdad49yx3s5dcj66qka/mblackstone`,
-          coinDecimals: 6
+          coinDecimals: 6,
         },
       ],
       feeCurrencies: [
