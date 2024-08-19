@@ -22,12 +22,12 @@ export const networks: Network[] = [
     govV1: false,
     explorerTxHashEndpoint: 'https://atomscan.com/agoric/transactions/',
     config: {
-      chainId: 'mantrachain-devnet-9001',
-      chainName: 'Mantra',
-      rest: 'https://dev-chain.mantra.finance:1317',
-      rpc: 'wss://dev-chain.mantra.finance:26657',
-      restURIs: ['https://dev-chain.mantra.finance:1317'],
-      rpcURIs: ['wss://dev-chain.mantra.finance:26657'],
+      chainId: 'mantra-devnet-1',
+      chainName: 'MANTRA Chain DevNet',
+      rest: 'https://rest-dev.canary.mantrachain.dev:443',
+      rpc: 'wss://rpc-dev.canary.mantrachain.dev:443',
+      restURIs: ['https://rest-dev.canary.mantrachain.dev:443'],
+      rpcURIs: ['wss://rpc-dev.canary.mantrachain.dev:443'],
       bech32Config: {
         bech32PrefixAccAddr: 'mantra',
         bech32PrefixAccPub: `mantrapub`,
@@ -154,7 +154,7 @@ export const networks: Network[] = [
           coinMinimalDenom: 'uom',
           coinDecimals: 6,
           gasPriceStep: {
-            low: 0.0004,
+            low: 0.0002,
             average: 0.0006,
             high: 0.0008,
           },
