@@ -7,9 +7,15 @@ on:
       - devops/configuring-CICD-k8s-deployment
     tags:
       - "v*.*.*"
+    paths:
+      - 'frontend/**'
+      - 'server/**'
   pull_request:
     branches:
       - mantra
+    paths:
+      - 'frontend/**'
+      - 'server/**'
 
 env:
   REGISTRY: ${{ vars.REGISTRY || 'ghcr.io' }}
