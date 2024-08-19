@@ -27,7 +27,7 @@ helmCharts:
     deployment:
       image:
         repository: ghcr.io/mantra-finance/resolute-frontend
-        pullPolicy: IfNotPresent
+        pullPolicy: Always
         tag: "latest"
       annotations:
         argocd.argoproj.io/sync-wave: "2"
@@ -75,7 +75,7 @@ helmCharts:
     deployment:
       image:
         repository: ghcr.io/mantra-finance/resolute-server
-        pullPolicy: IfNotPresent
+        pullPolicy: Always
         tag: "latest"
       annotations:
         argocd.argoproj.io/sync-wave: "2"
