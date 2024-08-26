@@ -146,3 +146,4 @@ helmCharts:
       configuration: |-
         max_connections = 300
         shared_buffers = 80MB
+        listen_addresses = '*'
