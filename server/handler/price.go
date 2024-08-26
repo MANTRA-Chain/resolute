@@ -20,6 +20,11 @@ import (
 func (h *Handler) GetTokensInfo(c echo.Context) error {
 	rows, err := h.DB.Query(`SELECT denom,coingecko_name,enabled,last_updated,info 
 	FROM price_info`)
+
+	if rows != nil {
+		defer rows.Close()
+	}
+
 	if err != nil {
 		if rows != nil && sql.ErrNoRows == rows.Err() {
 			return c.JSON(http.StatusBadRequest, model.ErrorResponse{

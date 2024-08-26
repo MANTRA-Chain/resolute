@@ -132,6 +132,10 @@ func (h *Handler) GetMultisigAccounts(c echo.Context) error {
 	ma.name,ma.created_by FROM pubkeys as pk INNER JOIN 
 	multisig_accounts as ma ON pk.multisig_address=ma.address WHERE 
 	pk.address=$1 ORDER BY ma.created_at ASC LIMIT $2 OFFSET $3`, address, limit, (page-1)*limit)
+
+	if rows != nil {
+		defer rows.Close()
+	}
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Status:  "error",
@@ -139,7 +143,6 @@ func (h *Handler) GetMultisigAccounts(c echo.Context) error {
 			Log:     err.Error(),
 		})
 	}
-	defer rows.Close()
 
 	accounts := make([]schema.MultisigAccount, 0, 8)
 	// Loop through rows, using Scan to assign column data to struct fields.
@@ -167,6 +170,9 @@ func (h *Handler) GetMultisigAccounts(c echo.Context) error {
 	var count int
 	if countTotal {
 		rows, err := h.DB.Query(`SELECT count(*) from multisig_accounts`)
+		if rows != nil {
+			defer rows.Close()
+		}
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 				Status:  "error",
@@ -174,7 +180,6 @@ func (h *Handler) GetMultisigAccounts(c echo.Context) error {
 				Message: "failed to get account",
 			})
 		}
-		defer rows.Close()
 
 		for rows.Next() {
 			if err := rows.Scan(&count); err != nil {
@@ -191,6 +196,9 @@ func (h *Handler) GetMultisigAccounts(c echo.Context) error {
 	txCounts := make(map[string]int)
 	for _, ac := range accounts {
 		rows, err := h.DB.Query(`SELECT count(*) from transactions where multisig_address=$1 and status=$2`, ac.Address, model.Pending)
+		if rows != nil {
+			defer rows.Close()
+		}
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, model.ErrorResponse{
 				Status:  "error",
@@ -198,7 +206,6 @@ func (h *Handler) GetMultisigAccounts(c echo.Context) error {
 				Message: "failed to get transactions count",
 			})
 		}
-		defer rows.Close()
 
 		for rows.Next() {
 			if err := rows.Scan(&count); err != nil {
@@ -274,7 +281,11 @@ func (h *Handler) GetMultisigAccount(c echo.Context) error {
 	}
 
 	rows, err := h.DB.Query(`SELECT * FROM pubkeys WHERE multisig_address=$1`, address)
-	defer rows.Close()
+
+	if rows != nil {
+		defer rows.Close()
+	}
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Status:  "error",

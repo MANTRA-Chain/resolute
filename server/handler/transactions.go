@@ -114,7 +114,9 @@ func (h *Handler) GetTransactions(c echo.Context) error {
 			address, limit, (page-1)*limit)
 	}
 
-	defer rows.Close()
+	if rows != nil {
+		defer rows.Close()
+	}
 
 	if err != nil {
 		if rows != nil && sql.ErrNoRows == rows.Err() {
@@ -182,8 +184,9 @@ func (h *Handler) GetAllMultisigTxns(c echo.Context) error {
 			Log:     err.Error(),
 		})
 	}
-
-	defer multisigRows.Close()
+	if multisigRows != nil {
+		defer multisigRows.Close()
+	}
 
 	transactions := make([]schema.AllTransactionResult, 0)
 
@@ -208,7 +211,9 @@ func (h *Handler) GetAllMultisigTxns(c echo.Context) error {
 				multisigAddress, limit, (page-1)*limit)
 		}
 
-		defer rows.Close()
+		if rows != nil {
+			defer rows.Close()
+		}
 
 		if err != nil {
 			if rows != nil && sql.ErrNoRows == rows.Err() {
