@@ -144,6 +144,6 @@ helmCharts:
       initdb:
         scriptsConfigMap: postgresql-init-script
       configuration: |-
-        max_connections = 300
-        shared_buffers = 80MB
+        max_connections = 500
+        shared_buffers = 500MB
         listen_addresses = '*'
