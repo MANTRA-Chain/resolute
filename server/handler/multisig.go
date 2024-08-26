@@ -139,6 +139,7 @@ func (h *Handler) GetMultisigAccounts(c echo.Context) error {
 			Log:     err.Error(),
 		})
 	}
+	defer rows.Close()
 
 	accounts := make([]schema.MultisigAccount, 0, 8)
 	// Loop through rows, using Scan to assign column data to struct fields.
@@ -173,6 +174,7 @@ func (h *Handler) GetMultisigAccounts(c echo.Context) error {
 				Message: "failed to get account",
 			})
 		}
+		defer rows.Close()
 
 		for rows.Next() {
 			if err := rows.Scan(&count); err != nil {
@@ -196,6 +198,7 @@ func (h *Handler) GetMultisigAccounts(c echo.Context) error {
 				Message: "failed to get transactions count",
 			})
 		}
+		defer rows.Close()
 
 		for rows.Next() {
 			if err := rows.Scan(&count); err != nil {
@@ -271,6 +274,7 @@ func (h *Handler) GetMultisigAccount(c echo.Context) error {
 	}
 
 	rows, err := h.DB.Query(`SELECT * FROM pubkeys WHERE multisig_address=$1`, address)
+	defer rows.Close()
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{
 			Status:  "error",
@@ -278,8 +282,6 @@ func (h *Handler) GetMultisigAccount(c echo.Context) error {
 			Log:     err.Error(),
 		})
 	}
-
-	defer rows.Close()
 
 	var pubkeys []schema.Pubkey
 	for rows.Next() {
@@ -353,6 +355,7 @@ func (h *Handler) DeleteMultisigAccount(c echo.Context) error {
 
 	tx, err := h.DB.BeginTx(ctx, nil)
 	if err != nil {
+		defer tx.Rollback()
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Status:  "error",
 			Message: "failed to initialize transaction",
@@ -362,6 +365,7 @@ func (h *Handler) DeleteMultisigAccount(c echo.Context) error {
 
 	_, err = tx.ExecContext(ctx, `DELETE from transactions WHERE multisig_address=$1`, address)
 	if err != nil {
+		defer tx.Rollback()
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Status:  "error",
 			Message: "failed to delete transactions for multisig account",
@@ -371,6 +375,7 @@ func (h *Handler) DeleteMultisigAccount(c echo.Context) error {
 
 	_, err = tx.ExecContext(ctx, `DELETE from pubkeys WHERE multisig_address=$1`, address)
 	if err != nil {
+		defer tx.Rollback()
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Status:  "error",
 			Message: "failed to delete public keys for multisig account",
@@ -380,6 +385,7 @@ func (h *Handler) DeleteMultisigAccount(c echo.Context) error {
 
 	_, err = tx.ExecContext(ctx, `DELETE from multisig_accounts WHERE address=$1`, address)
 	if err != nil {
+		defer tx.Rollback()
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Status:  "error",
 			Message: "failed to delete multisig account",

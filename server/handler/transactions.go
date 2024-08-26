@@ -113,6 +113,9 @@ func (h *Handler) GetTransactions(c echo.Context) error {
 		json_agg(jsonb_build_object('pubkey', p.pubkey, 'address', p.address, 'multisig_address',p.multisig_address)) AS pubkeys FROM transactions t JOIN multisig_accounts m ON t.multisig_address = m.address JOIN pubkeys p ON t.multisig_address = p.multisig_address WHERE t.multisig_address=$1 and t.status <> 'PENDING' GROUP BY t.id, t.multisig_address, m.threshold, t.messages LIMIT $2 OFFSET $3`,
 			address, limit, (page-1)*limit)
 	}
+
+	defer rows.Close()
+
 	if err != nil {
 		if rows != nil && sql.ErrNoRows == rows.Err() {
 			return c.JSON(http.StatusBadRequest, model.ErrorResponse{
@@ -128,7 +131,6 @@ func (h *Handler) GetTransactions(c echo.Context) error {
 			Log:     err.Error(),
 		})
 	}
-	defer rows.Close()
 
 	transactions := make([]schema.AllTransactionResult, 0)
 	for rows.Next() {
@@ -181,6 +183,8 @@ func (h *Handler) GetAllMultisigTxns(c echo.Context) error {
 		})
 	}
 
+	defer multisigRows.Close()
+
 	transactions := make([]schema.AllTransactionResult, 0)
 
 	for multisigRows.Next() {
@@ -203,6 +207,9 @@ func (h *Handler) GetAllMultisigTxns(c echo.Context) error {
 		json_agg(jsonb_build_object('pubkey', p.pubkey, 'address', p.address, 'multisig_address',p.multisig_address)) AS pubkeys FROM transactions t JOIN multisig_accounts m ON t.multisig_address = m.address JOIN pubkeys p ON t.multisig_address = p.multisig_address WHERE t.multisig_address=$1 and t.status <> 'PENDING' GROUP BY t.id, t.multisig_address, m.threshold, t.messages LIMIT $2 OFFSET $3`,
 				multisigAddress, limit, (page-1)*limit)
 		}
+
+		defer rows.Close()
+
 		if err != nil {
 			if rows != nil && sql.ErrNoRows == rows.Err() {
 				return c.JSON(http.StatusBadRequest, model.ErrorResponse{
@@ -246,7 +253,6 @@ func (h *Handler) GetAllMultisigTxns(c echo.Context) error {
 		}
 		rows.Close()
 	}
-	defer multisigRows.Close()
 
 	return c.JSON(http.StatusOK, model.SuccessResponse{
 		Data:   transactions,
