@@ -6,6 +6,13 @@ resources:
   - resources/server-config.yaml
   - resources/psql-init.yaml
 
+# enable logging in logs explorer
+labels:
+  - pairs:
+      gke.logging.enabled: "true"
+    includeSelectors: false
+    includeTemplates: true
+
 helmCharts:
 #
 # RESOLUTE FRONTEND
