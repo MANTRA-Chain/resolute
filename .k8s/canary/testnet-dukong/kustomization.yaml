@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: mantrachain-canary-devnet-v1
+namespace: mantrachain-canary-dukong
 
 resources:
   - resources/server-config.yaml
@@ -20,11 +20,11 @@ helmCharts:
 - name: generic-helm-chart
   repo: https://aaronforce1.github.io/generic-helm-chart
   version: 0.4.2
-  releaseName: resolute-frontend-devnet-v1
+  releaseName: resolute-frontend-dukong
   valuesFile: './values.yaml'
   valuesInline:
-    nameOverride: resolute-frontend-devnet-v1
-    fullnameOverride: resolute-frontend-devnet-v1
+    nameOverride: resolute-frontend-dukong
+    fullnameOverride: resolute-frontend-dukong
     service:
       port:
         - port: 3000
@@ -35,7 +35,7 @@ helmCharts:
       image:
         repository: ghcr.io/mantra-finance/resolute-frontend
         pullPolicy: Always
-        tag: "989d24b"
+        tag: "latest"
       annotations:
         argocd.argoproj.io/sync-wave: "2"
       service:
@@ -48,31 +48,31 @@ helmCharts:
         name: frontend
         className: nginx
         hosts:
-          - host: resolute.v1.devnet.canary.mantrachain.dev
+          - host: resolute.dukong.mantrachain.dev
             http:
               paths:
                 - backend:
                     service:
-                      name: resolute-frontend-devnet-v1
+                      name: resolute-frontend-dukong
                       port:
                         number: 3000
                   path: /
                   pathType: Prefix
         tls:
           - hosts:
-              - resolute.v1.devnet.canary.mantrachain.dev
-            secretName: canary.mantrachain.dev-wildcard-tls-secret
+              - resolute.dukong.mantrachain.dev
+            secretName: dukong.mantrachain.dev-wildcard-tls-secret
 #
 # RESOLUTE SERVER
 #
 - name: generic-helm-chart
   repo: https://aaronforce1.github.io/generic-helm-chart
   version: 0.4.2
-  releaseName: resolute-server-devnet-v1
+  releaseName: resolute-server-dukong
   valuesFile: './values.yaml'
   valuesInline:
-    nameOverride: resolute-server-devnet-v1
-    fullnameOverride: resolute-server-devnet-v1
+    nameOverride: resolute-server-dukong
+    fullnameOverride: resolute-server-dukong
     service:
       port:
         - port: 8000
@@ -83,7 +83,7 @@ helmCharts:
       image:
         repository: ghcr.io/mantra-finance/resolute-server
         pullPolicy: Always
-        tag: "989d24b"
+        tag: "latest"
       annotations:
         argocd.argoproj.io/sync-wave: "2"
       service:
@@ -93,17 +93,17 @@ helmCharts:
             name: http
       
       volumeMounts:
-      - name: resolute-server-devnet-v1-config
+      - name: resolute-server-dukong-config
         mountPath: /app/config.yaml
         subPath: config.yaml
-      - name: resolute-server-devnet-v1-config
+      - name: resolute-server-dukong-config
         mountPath: /app/networks.json
         subPath: networks.json
       
       volumes:
-      - name: resolute-server-devnet-v1-config
+      - name: resolute-server-dukong-config
         configMap:
-          name: resolute-server-devnet-v1-config
+          name: resolute-server-dukong-config
           defaultMode: 420
       
     ingress:
@@ -114,20 +114,20 @@ helmCharts:
           nginx.ingress.kubernetes.io/rewrite-target: /$2
           nginx.ingress.kubernetes.io/use-regex: 'true'
         hosts:
-          - host: resolute.v1.devnet.canary.mantrachain.dev
+          - host: resolute.dukong.mantrachain.dev
             http:
               paths:
                 - backend:
                     service:
-                      name: resolute-server-devnet-v1
+                      name: resolute-server-dukong
                       port:
                         number: 8000
                   path: /api(/|$)(.*)
                   pathType: Prefix
         tls:
           - hosts:
-              - resolute.v1.devnet.canary.mantrachain.dev
-            secretName: canary.mantrachain.dev-wildcard-tls-secret
+              - resolute.dukong.mantrachain.dev
+            secretName: dukong.mantrachain.dev-wildcard-tls-secret
 #
 # Higher Environments: Database should run as cloud-managed service
 #
@@ -135,7 +135,7 @@ helmCharts:
   repo: https://charts.bitnami.com/bitnami
   version: 13.3.1
   releaseName: postgresql
-  namespace: mantrachain-canary-devnet-v1
+  namespace: mantrachain-canary-dukong
   valuesInline:
     commonAnnotations:
       argocd.argoproj.io/sync-wave: "-1"
