@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: resolute-server-devnet-v1-config
+  name: resolute-server-dukong-config
 data:
   config.yaml: |
     active: "dev"
