@@ -1,0 +1,156 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: mantra-dukong-1-applications
+
+resources:
+  - resources/server-config.yaml
+  - resources/psql-init.yaml
+
+# enable logging in logs explorer
+labels:
+  - pairs:
+      gke.logging.enabled: "true"
+    includeSelectors: false
+    includeTemplates: true
+
+helmCharts:
+#
+# RESOLUTE FRONTEND
+#
+- name: generic-helm-chart
+  repo: https://aaronforce1.github.io/generic-helm-chart
+  version: 0.4.2
+  releaseName: resolute-frontend-dukong
+  valuesFile: './values.yaml'
+  valuesInline:
+    nameOverride: resolute-frontend-dukong
+    fullnameOverride: resolute-frontend-dukong
+    service:
+      port:
+        - port: 3000
+          targetPort: 3000
+          protocol: TCP
+          name: http
+    deployment:
+      image:
+        repository: ghcr.io/mantra-finance/resolute-frontend
+        pullPolicy: Always
+        tag: "latest"
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+      service:
+        port:
+          - containerPort: 3000
+            protocol: TCP
+            name: http
+    ingress:
+      - enabled: true
+        name: frontend
+        className: nginx
+        hosts:
+          - host: resolute.dukong.int.mantrachain.io
+            http:
+              paths:
+                - backend:
+                    service:
+                      name: resolute-frontend-dukong
+                      port:
+                        number: 3000
+                  path: /
+                  pathType: Prefix
+        tls:
+          - hosts:
+              - resolute.dukong.int.mantrachain.io
+            secretName: dukong.int.mantrachain.io-wildcard-tls-secret
+#
+# RESOLUTE SERVER
+#
+- name: generic-helm-chart
+  repo: https://aaronforce1.github.io/generic-helm-chart
+  version: 0.4.2
+  releaseName: resolute-server-dukong
+  valuesFile: './values.yaml'
+  valuesInline:
+    nameOverride: resolute-server-dukong
+    fullnameOverride: resolute-server-dukong
+    service:
+      port:
+        - port: 8000
+          targetPort: 1323
+          protocol: TCP
+          name: http
+    deployment:
+      image:
+        repository: ghcr.io/mantra-finance/resolute-server
+        pullPolicy: Always
+        tag: "latest"
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+      service:
+        port:
+          - containerPort: 1323
+            protocol: TCP
+            name: http
+      
+      volumeMounts:
+      - name: resolute-server-dukong-config
+        mountPath: /app/config.yaml
+        subPath: config.yaml
+      - name: resolute-server-dukong-config
+        mountPath: /app/networks.json
+        subPath: networks.json
+      
+      volumes:
+      - name: resolute-server-dukong-config
+        configMap:
+          name: resolute-server-dukong-config
+          defaultMode: 420
+      
+    ingress:
+      - enabled: true
+        name: api
+        className: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/rewrite-target: /$2
+          nginx.ingress.kubernetes.io/use-regex: 'true'
+        hosts:
+          - host: resolute.dukong.int.mantrachain.io
+            http:
+              paths:
+                - backend:
+                    service:
+                      name: resolute-server-dukong
+                      port:
+                        number: 8000
+                  path: /api(/|$)(.*)
+                  pathType: Prefix
+        tls:
+          - hosts:
+              - resolute.dukong.int.mantrachain.io
+            secretName: dukong.int.mantrachain.io-wildcard-tls-secret
+#
+# Higher Environments: Database should run as cloud-managed service
+#
+- name: postgresql
+  repo: https://charts.bitnami.com/bitnami
+  version: 13.3.1
+  releaseName: postgresql
+  namespace: mantra-dukong-1-applications
+  valuesInline:
+    commonAnnotations:
+      argocd.argoproj.io/sync-wave: "-1"
+
+    global:
+      postgresql:
+        auth:
+          database: resolute
+          username: resolute
+          password: heartland-ocean-praetor-neat
+
+    primary:
+      initdb:
+        scriptsConfigMap: postgresql-init-script
+      configuration: |-
+        max_connections = 500
+        shared_buffers = 500MB
+        listen_addresses = '*'
