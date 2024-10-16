@@ -25,6 +25,6 @@ data:
     [
       {
         "chainId": "mantra-dukong-1",
-        "restURIs": ["https://api.dukong.mantrachain.dev:443"]
+        "restURIs": ["https://api.dukong.mantrachain.io:443"]
       },
     ]

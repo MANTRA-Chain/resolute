@@ -24,10 +24,10 @@ export const networks: Network[] = [
     config: {
       chainId: 'mantra-dukong-1',
       chainName: 'MANTRA-DuKong',
-      rest: 'https://api.dukong.mantrachain.dev',
-      rpc: 'wss://rpc.dukong.mantrachain.dev',
-      restURIs: ['https://api.dukong.mantrachain.dev'],
-      rpcURIs: ['wss://rpc.dukong.mantrachain.dev'],
+      rest: 'https://api.dukong.mantrachain.io',
+      rpc: 'wss://rpc.dukong.mantrachain.io',
+      restURIs: ['https://api.dukong.mantrachain.io'],
+      rpcURIs: ['wss://rpc.dukong.mantrachain.io'],
       bech32Config: {
         bech32PrefixAccAddr: 'mantra',
         bech32PrefixAccPub: `mantrapub`,
