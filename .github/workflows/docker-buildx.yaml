@@ -1,6 +1,7 @@
 name: Docker Buildx - Standard
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - mantra
@@ -10,12 +11,14 @@ on:
     paths:
       - 'frontend/**'
       - 'server/**'
+      - '.github/workflows/docker-buildx.yaml'
   pull_request:
     branches:
       - mantra
     paths:
       - 'frontend/**'
       - 'server/**'
+      - '.github/workflows/docker-buildx.yaml'
 
 env:
   REGISTRY: ${{ vars.REGISTRY || 'ghcr.io' }}
