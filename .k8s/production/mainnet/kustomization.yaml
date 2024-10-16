@@ -1,0 +1,169 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: mantra-1-applications
+
+resources:
+  - resources/server-config.yaml
+  - resources/psql-init.yaml
+  - secrets/postgresql-database-secret.yaml
+
+# enable logging in logs explorer
+labels:
+  - pairs:
+      gke.logging.enabled: "true"
+    includeSelectors: false
+    includeTemplates: true
+
+helmCharts:
+#
+# RESOLUTE FRONTEND
+#
+- name: generic-helm-chart
+  repo: https://aaronforce1.github.io/generic-helm-chart
+  version: 0.4.2
+  releaseName: resolute-frontend-mainnet
+  valuesFile: './values.yaml'
+  valuesInline:
+    nameOverride: resolute-frontend-mainnet
+    fullnameOverride: resolute-frontend-mainnet
+    service:
+      port:
+        - port: 3000
+          targetPort: 3000
+          protocol: TCP
+          name: http
+    deployment:
+      image:
+        repository: ghcr.io/mantra-finance/resolute-frontend
+        pullPolicy: Always
+        tag: "latest"
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+      service:
+        port:
+          - containerPort: 3000
+            protocol: TCP
+            name: http
+    ingress:
+      - enabled: true
+        name: frontend
+        className: nginx
+        # annotations:
+        #   kubernetes.io/ingress.class: ambassador
+        hosts:
+          - host: resolute.int.mantrachain.io
+            http:
+              paths:
+                - backend:
+                    service:
+                      name: resolute-frontend-mainnet
+                      port:
+                        number: 3000
+                  path: /
+                  pathType: Prefix
+        tls:
+          - hosts:
+              - resolute.int.mantrachain.io
+            secretName: int.asia-east2-std.mantrachain.io-wildcard-tls
+#
+# RESOLUTE SERVER
+#
+- name: generic-helm-chart
+  repo: https://aaronforce1.github.io/generic-helm-chart
+  version: 0.4.2
+  releaseName: resolute-server-mainnet
+  valuesFile: './values.yaml'
+  valuesInline:
+    nameOverride: resolute-server-mainnet
+    fullnameOverride: resolute-server-mainnet
+    service:
+      port:
+        - port: 8000
+          targetPort: 1323
+          protocol: TCP
+          name: http
+    deployment:
+      image:
+        repository: ghcr.io/mantra-finance/resolute-server
+        pullPolicy: Always
+        tag: "latest"
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+      service:
+        port:
+          - containerPort: 1323
+            protocol: TCP
+            name: http
+      
+      volumeMounts:
+      - name: resolute-server-mainnet-secrets
+        mountPath: /app/config.yaml
+        subPath: config.yaml
+      - name: resolute-server-mainnet-config
+        mountPath: /app/networks.json
+        subPath: networks.json
+      
+      volumes:
+      - name: resolute-server-mainnet-config
+        configMap:
+          name: resolute-server-mainnet-config
+          defaultMode: 420
+      - name: resolute-server-mainnet-secrets
+        secret:
+          secretName: mantra-chain-mainnet-application-resolute-secrets
+          defaultMode: 420
+      
+    ingress:
+      - enabled: true
+        name: api
+        className: nginx
+        annotations:
+          # kubernetes.io/ingress.class: ambassador
+          nginx.ingress.kubernetes.io/rewrite-target: /$2
+          nginx.ingress.kubernetes.io/use-regex: 'true'
+        hosts:
+          - host: resolute.int.mantrachain.io
+            http:
+              paths:
+                - backend:
+                    service:
+                      name: resolute-server-mainnet
+                      port:
+                        number: 8000
+                  path: /api(/|$)(.*)
+                  pathType: Prefix
+        tls:
+          - hosts:
+              - resolute.int.mantrachain.io
+            secretName: int.asia-east2-std.mantrachain.io-wildcard-tls
+#
+# Higher Environments: Database should run as cloud-managed service
+#
+- name: postgresql
+  repo: https://charts.bitnami.com/bitnami
+  version: 16.0.1
+  releaseName: postgresql
+  namespace: mantra-mainnet-1-applications
+  valuesInline:
+    commonAnnotations:
+      argocd.argoproj.io/sync-wave: "-1"
+
+    global:
+      postgresql:
+        auth:
+          database: resolute-mainnet
+          username: resolute-mainnet
+          existingSecret: mantra-chain-mainnet-application-resolute-secrets
+          secretKeys:
+            adminPasswordKey: "adminPassword"
+            userPasswordKey: "userPassword"
+            replicationPasswordKey: "replicationPassword"
+
+    primary:
+      initdb:
+        scriptsConfigMap: postgresql-init-script
+      configuration: |-
+        max_connections = 500
+        shared_buffers = 500MB
+        listen_addresses = '*'
+
