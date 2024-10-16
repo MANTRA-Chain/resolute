@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resolute-server-mainnet-config
+data:
+  networks.json: |
+    [
+      {
+        "chainId": "mantra-1",
+        "restURIs": ["https://api.mantrachain.io:443"]
+      },
+    ]
