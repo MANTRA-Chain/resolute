@@ -12,7 +12,7 @@ import {
 } from '@/types/multisig';
 import { API_URL } from '@/utils/constants';
 import { getAddressByPrefix } from '@/utils/address';
-import { SigningStargateClient } from '@cosmjs/stargate';
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 
 const BASE_URL: string = cleanURL(API_URL);
 
@@ -124,7 +124,7 @@ export const deleteMultisig = (
 export const getStargateClient = async (urls: string[]) => {
   for (const url of urls) {
     try {
-      const client = await SigningStargateClient.connect(url);
+      const client = await SigningCosmWasmClient.connect(url);
       return client;
       /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (error: any) {

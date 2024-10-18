@@ -1,6 +1,7 @@
 import { getWalletAmino } from '@/txns/execute';
 import { MultisigAddressPubkey, Pubkey, Txn } from '@/types/multisig';
-import { makeMultisignedTx, SigningStargateClient } from '@cosmjs/stargate';
+import { makeMultisignedTx } from '@cosmjs/stargate';
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { toBase64 } from '@cosmjs/encoding';
 import { getAuthToken } from '@/utils/localStorage';
 import { COSMOS_CHAIN_ID } from '@/utils/constants';
@@ -38,7 +39,7 @@ const signTransaction = async (
 
     const result = await getWalletAmino(chainID);
     const wallet = result[0];
-    const signingClient = await SigningStargateClient.offline(wallet);
+    const signingClient = await SigningCosmWasmClient.offline(wallet);
 
     const multisigAcc = await client.getAccount(multisigAddress);
     if (!multisigAcc) {
@@ -123,7 +124,7 @@ export async function broadcastTransaction(data: {
     };
 
     const walletAmino = await getWalletAmino(data.chainID);
-    const offlineClient = await SigningStargateClient.offline(walletAmino[0]);
+    const offlineClient = await SigningCosmWasmClient.offline(walletAmino[0]);
     const txBodyBytes = offlineClient.registry.encode(txBody);
 
     const signedTx = makeMultisignedTx(

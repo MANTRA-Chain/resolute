@@ -1,11 +1,11 @@
 import { OfflineAminoSigner, OfflineDirectSigner } from '@keplr-wallet/types';
 
 import {
-  SigningStargateClient,
   defaultRegistryTypes,
   StdFee,
   DeliverTxResponse,
 } from '@cosmjs/stargate';
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import { GeneratedType, Registry } from '@cosmjs/proto-signing';
 import { GAS_FEE } from '../utils/constants';
@@ -29,7 +29,7 @@ export async function signAndBroadcastAmino(
     registry.register(v[0], v[1]);
   });
 
-  const cosmJS = await SigningStargateClient.connectWithSigner(rpcURL, wallet, {
+  const cosmJS = await SigningCosmWasmClient.connectWithSigner(rpcURL, wallet, {
     registry: registry,
   });
 
@@ -41,7 +41,7 @@ export async function signAndBroadcastProto(
   fee: StdFee,
   rpcURL: string
 ): Promise<DeliverTxResponse> {
-  const client = await SigningStargateClient.connect(rpcURL);
+  const client = await SigningCosmWasmClient.connect(rpcURL);
 
   const chainId = await client.getChainId();
   const result = await getWalletDirect(chainId);
@@ -52,7 +52,7 @@ export async function signAndBroadcastProto(
     registry.register(v[0], v[1]);
   });
 
-  const signingClient = await SigningStargateClient.offline(wallet, {
+  const signingClient = await SigningCosmWasmClient.offline(wallet, {
     registry: registry,
   });
 
