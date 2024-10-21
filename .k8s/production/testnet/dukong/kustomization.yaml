@@ -33,7 +33,7 @@ helmCharts:
           name: http
     deployment:
       image:
-        repository: ghcr.io/mantra-finance/resolute-frontend
+        repository: ghcr.io/mantra-chain/resolute-frontend
         pullPolicy: Always
         tag: "latest"
       annotations:
@@ -81,7 +81,7 @@ helmCharts:
           name: http
     deployment:
       image:
-        repository: ghcr.io/mantra-finance/resolute-server
+        repository: ghcr.io/mantra-chain/resolute-server
         pullPolicy: Always
         tag: "latest"
       annotations:
