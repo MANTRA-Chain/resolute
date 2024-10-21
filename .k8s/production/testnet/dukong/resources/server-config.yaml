@@ -12,6 +12,7 @@ data:
         port: 1323
       coingecko:
         uri: "https://api.coingecko.com/api/v3/"
+      redisUri: "resolute-redis-dukong-master:6379"
 
     dev:
       database:
