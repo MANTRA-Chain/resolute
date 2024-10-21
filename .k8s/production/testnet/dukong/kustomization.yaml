@@ -62,7 +62,7 @@ helmCharts:
         tls:
           - hosts:
               - resolute.dukong.int.mantrachain.io
-            secretName: dukong.int.mantrachain.io-wildcard-tls-secret
+            secretName: int.asia-east2-std.mantrachain.io-wildcard-tls
 #
 # RESOLUTE SERVER
 #
@@ -128,7 +128,7 @@ helmCharts:
         tls:
           - hosts:
               - resolute.dukong.int.mantrachain.io
-            secretName: dukong.int.mantrachain.io-wildcard-tls-secret
+            secretName: int.asia-east2-std.mantrachain.io-wildcard-tls
 #
 # Higher Environments: Database should run as cloud-managed service
 #
