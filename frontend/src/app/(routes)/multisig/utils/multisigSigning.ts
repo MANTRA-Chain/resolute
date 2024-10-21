@@ -17,6 +17,7 @@ import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import { parseTxResult } from '@/utils/signing';
 import { NETWORK_ERROR } from '@/utils/errors';
 import multisigService from '@/store/features/multisig/multisigService';
+import { CheckForWasmMsgs } from '@/utils/cosmwasm';
 
 declare let window: WalletWindow;
 
@@ -53,10 +54,11 @@ const signTransaction = async (
     };
 
     const msgs = unSignedTxn?.messages || [];
+    const signMsgs = CheckForWasmMsgs(msgs);
 
     const { signatures } = await signingClient.sign(
       walletAddress,
-      msgs,
+      signMsgs,
       unSignedTxn?.fee || { amount: [], gas: '' },
       unSignedTxn?.memo || '',
       signerData
@@ -115,10 +117,12 @@ export async function broadcastTransaction(data: {
       `${data.threshold}`
     );
 
+    const broadcastMsgs = CheckForWasmMsgs(data.signedTxn.messages);
+
     const txBody = {
       typeUrl: '/cosmos.tx.v1beta1.TxBody',
       value: {
-        messages: data.signedTxn.messages,
+        messages: broadcastMsgs,
         memo: data.signedTxn.memo,
       },
     };
