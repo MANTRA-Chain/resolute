@@ -8,13 +8,14 @@ import {
 import { getWalletAmino } from '@/txns/execute';
 import { Txn } from '@/types/multisig';
 import { getAuthToken } from '@/utils/localStorage';
-import { SigningStargateClient } from '@cosmjs/stargate';
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { toBase64 } from '@cosmjs/encoding';
 import React, { useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import { ERR_UNKNOWN } from '@/utils/errors';
 import useVerifyAccount from '@/custom-hooks/useVerifyAccount';
 import { COSMOS_CHAIN_ID } from '@/utils/constants';
+import { CheckForWasmMsgs } from '@/utils/cosmwasm';
 
 interface SignTxnProps {
   address: string;
@@ -50,11 +51,11 @@ const SignTxn: React.FC<SignTxnProps> = (props) => {
       },
     };
     try {
-      const client = await SigningStargateClient.connect(rpc);
+      const client = await SigningCosmWasmClient.connect(rpc);
 
       const result = await getWalletAmino(chainID);
       const wallet = result[0];
-      const signingClient = await SigningStargateClient.offline(wallet);
+      const signingClient = await SigningCosmWasmClient.offline(wallet);
 
       const multisigAcc = await client.getAccount(address);
       if (!multisigAcc) {
@@ -75,10 +76,11 @@ const SignTxn: React.FC<SignTxnProps> = (props) => {
       };
 
       const msgs = unSignedTxn?.messages || [];
+      const signMsgs = CheckForWasmMsgs(msgs);
 
       const { signatures } = await signingClient.sign(
         walletAddress,
-        msgs,
+        signMsgs,
         unSignedTxn?.fee || { amount: [], gas: '' },
         unSignedTxn?.memo || '',
         signerData

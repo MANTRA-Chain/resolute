@@ -11,7 +11,8 @@ import { getWalletAmino } from '@/txns/execute';
 import { MultisigAddressPubkey, Pubkey, Txn } from '@/types/multisig';
 import { getAuthToken } from '@/utils/localStorage';
 import { NewMultisigThresholdPubkey } from '@/utils/util';
-import { SigningStargateClient, makeMultisignedTx } from '@cosmjs/stargate';
+import { makeMultisignedTx } from '@cosmjs/stargate';
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { fromBase64 } from '@cosmjs/encoding';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import React, { useEffect, useState } from 'react';
@@ -20,6 +21,7 @@ import { FAILED_TO_BROADCAST_ERROR } from '@/utils/errors';
 import { CircularProgress } from '@mui/material';
 import useVerifyAccount from '@/custom-hooks/useVerifyAccount';
 import { COSMOS_CHAIN_ID } from '@/utils/constants';
+import { CheckForWasmMsgs } from '@/utils/cosmwasm';
 
 interface BroadCastTxnProps {
   txn: Txn;
@@ -73,7 +75,7 @@ const BroadCastTxn: React.FC<BroadCastTxnProps> = (props) => {
       signature: authToken?.signature || '',
     };
     try {
-      const client = await SigningStargateClient.connect(rpc);
+      const client = await SigningCosmWasmClient.connect(rpc);
 
       const multisigAcc = await client.getAccount(multisigAddress);
       if (!multisigAcc) {
@@ -104,16 +106,17 @@ const BroadCastTxn: React.FC<BroadCastTxnProps> = (props) => {
         `${threshold}`
       );
 
+      const broadcastMsgs = CheckForWasmMsgs(txn?.messages || []);
       const txBody = {
         typeUrl: '/cosmos.tx.v1beta1.TxBody',
         value: {
-          messages: txn.messages,
+          messages: broadcastMsgs,
           memo: txn.memo,
         },
       };
 
       const walletAmino = await getWalletAmino(chainID);
-      const offlineClient = await SigningStargateClient.offline(walletAmino[0]);
+      const offlineClient = await SigningCosmWasmClient.offline(walletAmino[0]);
       const txBodyBytes = offlineClient.registry.encode(txBody);
 
       const signedTx = makeMultisignedTx(
