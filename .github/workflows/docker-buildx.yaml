@@ -72,4 +72,4 @@ jobs:
         COMMIT_SHA: echo ${{ github.event.workflow_run.head_sha || github.sha }} | cut -c1-7
       with:
         slack_notification_webhook: ${{ secrets.SLACK_WEBHOOK_CICD_NOTIFICATIONS }}
-        slack_message: ":siren: *[ERROR!] DOCKER BUILD PROCESS FAILED TO COMPLETE SUCCESSFULLY!!* \n<hr/>\n\n`${{ github.actor }}` tried to build docker image for `${{ github.event.repository.name }}`.\n`${{ env.COMMIT_SHA }}` on `${{ github.ref_name }}`. The details at:\n<hr/>\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        slack_message: "*[ERROR!] DOCKER BUILD PROCESS FAILED TO COMPLETE SUCCESSFULLY!!* \n\n`${{ github.actor }}` tried to build docker image for `${{ github.event.repository.name }}`.\n`${{ env.COMMIT_SHA }}` on `${{ github.ref_name }}`. The details at:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
