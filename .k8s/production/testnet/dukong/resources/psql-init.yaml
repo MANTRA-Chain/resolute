@@ -2,6 +2,8 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgresql-init-script
+  annotations:
+    argocd.argoproj.io/hook: PreSync
 data:
   schema.sql: |
     --

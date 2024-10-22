@@ -34,7 +34,7 @@ helmCharts:
           name: http
     deployment:
       image:
-        repository: ghcr.io/mantra-finance/resolute-frontend
+        repository: ghcr.io/mantra-chain/resolute-frontend
         pullPolicy: Always
         tag: "latest"
       annotations:
@@ -48,8 +48,6 @@ helmCharts:
       - enabled: true
         name: frontend
         className: nginx
-        # annotations:
-        #   kubernetes.io/ingress.class: ambassador
         hosts:
           - host: resolute.int.mantrachain.io
             http:
@@ -84,7 +82,7 @@ helmCharts:
           name: http
     deployment:
       image:
-        repository: ghcr.io/mantra-finance/resolute-server
+        repository: ghcr.io/mantra-chain/resolute-server
         pullPolicy: Always
         tag: "latest"
       annotations:
@@ -118,7 +116,6 @@ helmCharts:
         name: api
         className: nginx
         annotations:
-          # kubernetes.io/ingress.class: ambassador
           nginx.ingress.kubernetes.io/rewrite-target: /$2
           nginx.ingress.kubernetes.io/use-regex: 'true'
         hosts:
@@ -139,6 +136,9 @@ helmCharts:
 #
 # Higher Environments: Database should run as cloud-managed service
 #
+########################################################
+## POSTGRES
+########################################################
 - name: postgresql
   repo: https://charts.bitnami.com/bitnami
   version: 16.0.1
@@ -166,4 +166,53 @@ helmCharts:
         max_connections = 500
         shared_buffers = 500MB
         listen_addresses = '*'
+#
+# Higher Environments: Database should run as cloud-managed service
+#
+########################################################
+## REDIS
+########################################################
+- name: redis
+  repo: oci://registry-1.docker.io/bitnamicharts
+  version: 20.2.1
+  releaseName: resolute-redis-dukong
+  valuesInline:
+    commonAnnotations:
+      argocd.argoproj.io/sync-wave: "-1"
+    commonLabels:
+      app.kubernetes.io/part-of: resolute-server-dukong
+      platform/cluster: mantra-testnet
+      platform/environment: production
+      db-migration: "false"
 
+    image:
+      registry: docker.io
+      repository: redis/redis-stack-server 
+      tag: latest
+
+    commonConfiguration: |-
+      port 6379
+      daemonize no
+      loadmodule /opt/redis-stack/lib/rediscompat.so
+      loadmodule /opt/redis-stack/lib/redisearch.so
+      loadmodule /opt/redis-stack/lib/redistimeseries.so
+      loadmodule /opt/redis-stack/lib/rejson.so
+      loadmodule /opt/redis-stack/lib/redisbloom.so
+      loadmodule /opt/redis-stack/lib/redisgears.so v8-plugin-path /opt/redis-stack/lib/libredisgears_v8_plugin.so
+
+    auth:
+      enabled: false
+      ## TODO: REENABLE THIS ONCE WE UPDATE SERVER.GO TO SUPPORT REDIS AUTH
+      # existingSecret: resolute-redis-secrets
+      # existingSecretPasswordKey: redis-password
+
+    architecture: standalone
+
+    master:
+      resourcesPreset: "nano"
+      #persistence:
+      #  size: 500M
+      persistentVolumeClaimRetentionPolicy:
+        enabled: true
+        whenScaled: Retain
+        whenDeleted: Retain
