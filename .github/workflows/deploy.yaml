@@ -1,0 +1,110 @@
+# Version: 1.0.0
+# Description: This is a GitHub Actions workflow file that deploys a Docker image to a Kubernetes cluster using ArgoCD.
+# Notes: This workflow file is the default process for deploying to ArgoCD - including canary and uat environments prior to release/deployment_tag.yaml.
+# Usage: This file is intended to be used in conjunction with the ArgoCD deployment process.
+# Parameters:
+# -
+# - ARGOCD_APP_ACCESS_TOKEN: The ArgoCD Application Deployment Repository Access Token.
+# - ARGOCD_REPO: The ArgoCD Application Deployment Repository.
+# - ARGOCD_REPO_REF: The ArgoCD Application Deployment Repository Branch Name.
+# - ARGOCD_UPDATE_PATHS: The ArgoCD Application Deployment Update Paths, i.e. `".spec.template.spec.containers[0].image"` or similar.
+# - ARGOCD_TARGET_PATH: The ArgoCD Application Deployment Target Path, i.e. `argocd/application/{'argocd/application/{0}.yaml' - github.event.repository.name}` or similar.
+# - ARGOCD_TARGET_ENVIRONMENT: The ArgoCD Application Deployment Target Environment, i.e. `production/testnet/dukong`. This is the prefix for the ARGOCD_TARGET_PATH.
+# - REGISTRY: The Container Registry URI for the Docker image to be deployed.
+# - SLACK_WEBHOOK_ARGOCD_DEPLOY: The Slack Webhook URL for ArgoCD Deployment Notifications.
+# -
+name: K8s Deployment - ArgoCD
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Deployment tag (typically a branch name or git commit sha) to deploy to non-production environments; otherwise will pick up current commit hash.'
+      argocd_target_paths:
+        description: "ArgoCD Application Deployment Targets, i.e. `argocd/application/{'argocd/application/{0}.yaml' - github.event.repository.name}` or similar."
+  workflow_run:
+    workflows: 
+      - "Docker Buildx - Standard"
+    branches: 
+      - mantra
+      - devops/configuring-CICD-k8s-deployment
+      - mantra-cosmwasm
+    types:
+      - completed
+
+env:
+  ARGOCD_TARGET_PATH: "${{ inputs.argocd_target_paths || vars.ARGOCD_TARGET_PATH || secrets.ARGOCD_TARGET_PATH || format('argocd/application/{0}.yaml', github.event.repository.name) }}"
+  REGISTRY: ${{ vars.REGISTRY || secrets.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
+  IMAGE_NAME: ${{ vars.IMAGE_NAME || github.event.repository.name }}
+
+jobs:
+  prepare-deployment:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    steps:
+    - name: Define Variables
+      id: vars
+      run: |
+        echo "::set-output name=version::`echo ${{ github.event.workflow_run.head_sha || github.sha }} | cut -c1-7`"
+    outputs:
+      version: ${{ steps.vars.outputs.version }}
+
+  deploy:
+    name: Deploy / Production / Testnet / DuKong
+    runs-on: ubuntu-latest
+    needs:
+      - prepare-deployment
+    environment:
+      name: production-testnet-dukong
+      url: https://resolute.dukong.mantrachain.io
+    env:
+      IMAGE_TAG: ${{ github.event.inputs.tag || needs.prepare-deployment.outputs.version }}
+      ARGOCD_REPO: mantra-finance/infra-argocd-gke-mantra
+      ARGOCD_REPO_REF: production
+      ARGOCD_UPDATE_PATHS: ".spec.source.kustomize.images[0]"
+      ARGOCD_TARGET_PATH: >-
+        asia-east2-std/blockchain/argocd-app-mantrachain-blockchain-dukong-apps-resolute.yaml
+      ARGOCD_TARGET_ENVIRONMENT: "production/testnet/dukong"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Review ArgoCD Target Path
+        id: argocd_target_path
+        shell: bash
+        run: |
+            if [[ "${{ env.ARGOCD_TARGET_PATH }}" == *,* ]]; then
+              echo "The ARGOCD_TARGET_PATH environment variable has multiple paths. Concatinating with ARGOCD_TARGET_ENVIRONMENT."
+              read -ra target_paths <<< "${{ env.ARGOCD_TARGET_PATH }}"
+              argocd_target_paths_new=()
+              for path in "${target_paths[@]}";
+                do
+                  argocd_target_paths_new+=("${ARGOCD_TARGET_ENVIRONMENT}/${path}")
+                done
+              echo "::set-output name=argocd_target_paths::${argocd_target_paths_new[@]}"
+              echo "ARGOCD_TARGET_PATH set: ${argocd_target_paths_new[@]}"
+            else
+              echo "The ARGOCD_TARGET_PATH environment variable has only single path."
+              echo "::set-output name=argocd_target_paths::`echo ${ARGOCD_TARGET_ENVIRONMENT}/${ARGOCD_TARGET_PATH}`"
+              echo "ARGOCD_TARGET_PATH set: ${ARGOCD_TARGET_ENVIRONMENT}/${ARGOCD_TARGET_PATH}"
+            fi
+      - name: Deployment
+        uses: mantra-chain-tech/infra-github-actions-mantrachain/argocd-deploy-v2@main
+        with:
+          argocd_repo_ref: ${{ env.ARGOCD_REPO_REF }}
+          argocd_git_token: ${{ env.ARGOCD_APP_ACCESS_TOKEN }}
+          argocd_repo: ${{ env.ARGOCD_REPO_PATH }}
+          argocd_target_path: "${{ steps.argocd_target_path.outputs.argocd_target_paths || format('{0}/{1}', env.ARGOCD_TARGET_ENVIRONMENT, env.ARGOCD_TARGET_PATH) }}"
+          update_paths: ${{ env.ARGOCD_UPDATE_PATHS }}
+          update_value: "${{ env.REGISTRY }}:${{ env.IMAGE_TAG }}"
+          update_message: "(CICD) Deploy ${{ github.event.repository.name }}: ${{ env.REGISTRY }}:${{ env.IMAGE_TAG }} to ${{ env.TARGET_ENVIRONMENT}}"
+      - name: Success Notification
+        uses: mantra-chain-tech/infra-github-actions-mantrachain/slack-notifications@main
+        with:
+          slack_notification_webhook: ${{ secrets.SLACK_WEBHOOK_ARGOCD_DEPLOY }}
+          slack_message: "`${{ github.event.repository.name }}` deployed to `${{ env.ARGOCD_TARGET_ENVIRONMENT }}: `${{ env.REGISTRY }}:${{ env.IMAGE_TAG }}`.\nThe details at: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      - name: Failure Notification
+        if: failure()
+        uses: mantra-chain-tech/infra-github-actions-mantrachain/slack-notifications@main
+        with:
+          slack_notification_webhook: ${{ secrets.SLACK_WEBHOOK_ARGOCD_DEPLOY }}
+          slack_message: "*[WARNING!] FAILED TO DEPLOY!!*\n`${{ github.actor }}` tried to push `${{ github.event.repository.name }}` to `${{ env.ARGOCD_TARGET_ENVIRONMENT }}`: `${{ env.REGISTRY }}:${{ env.IMAGE_TAG }}`.\nThe details at: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
