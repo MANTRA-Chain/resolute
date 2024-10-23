@@ -2,6 +2,8 @@ ARG NEXT_PUBLIC_APP_API_URI=/api
 
 FROM node:20-alpine AS builder
 
+RUN corepack enable
+
 # Use the node user from the image (instead of the root user)
 USER node
 
@@ -13,9 +15,11 @@ WORKDIR /app
 # Copying this first prevents re-running npm install on every code change.
 COPY --chown=node:node package.json .
 COPY --chown=node:node yarn.lock .
+COPY --chown=node:node .yarnrc.yml .
+COPY --chown=node:node .yarn/ .
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
-RUN yarn --frozen-lockfile
+RUN yarn install --immutable
 
 # Bundle app source
 COPY --chown=node:node . .
