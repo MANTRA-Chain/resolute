@@ -206,7 +206,8 @@ const NewTxnMsg = ({
               <span>
                 <div className="font-bold">
                   <span>
-                    {get(msgs, '[0].msgs', []).map((m, mindex) => (
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {get(msgs, '[0].msgs', []).map((m: any, mindex: number) => (
                       <div key={mindex}>
                         Authz&nbsp;{getTypeURLName(get(m, '@type'))}
                       </div>
