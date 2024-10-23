@@ -175,13 +175,13 @@ helmCharts:
 - name: redis
   repo: oci://registry-1.docker.io/bitnamicharts
   version: 20.2.1
-  releaseName: resolute-redis-dukong
+  releaseName: resolute-redis-mainnet
   valuesInline:
     commonAnnotations:
       argocd.argoproj.io/sync-wave: "-1"
     commonLabels:
-      app.kubernetes.io/part-of: resolute-server-dukong
-      platform/cluster: mantra-testnet
+      app.kubernetes.io/part-of: resolute-server-mainnet
+      platform/cluster: mantra-mainnet
       platform/environment: production
       db-migration: "false"
 
