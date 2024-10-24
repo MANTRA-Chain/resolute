@@ -10,6 +10,10 @@ import (
 
 func (c *Cron) StartCheckUris() {
 	data := config.GetChainAPIs()
+	// error already logged in GetChainAPIs
+	if data == nil {
+		return
+	}
 	for _, c := range data {
 		for _, u := range c.RestURIs {
 			if c.CheckStatus {
@@ -21,7 +25,6 @@ func (c *Cron) StartCheckUris() {
 			} else {
 				c.RestURI = u
 			}
-
 		}
 	}
 
