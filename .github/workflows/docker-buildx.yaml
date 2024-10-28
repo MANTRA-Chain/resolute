@@ -1,3 +1,6 @@
+# Version: 1.0.0
+# Description: This is a GitHub Actions workflow file that builds and pushes a Docker image to Amazon ECR.
+# Notes:
 name: Docker Buildx - Standard
 
 on:
@@ -22,7 +25,10 @@ on:
       - ".github/workflows/docker-buildx.yaml"
 
 env:
-  REGISTRY: ${{ vars.REGISTRY || 'ghcr.io' }}
+  REGISTRY: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
+  IMAGE_NAME: ${{ vars.IMAGE_NAME || github.event.repository.name }}
+  BUILD_ARGS: ${{ vars.BUILD_ARGS || '' }}
+  BUILD_ARCH: ${{ vars.BUILD_ARCH || 'linux/amd64,linux/arm64' }}
 
 # Set concurrency for this workflow to cancel in-progress jobs if retriggered.
 # The github.ref is only available when triggered by a PR so fall back to github.run_id for other cases.
@@ -33,7 +39,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
   cancel-in-progress: true
 jobs:
-  docker:
+  buildx:
     permissions:
       packages: write
       contents: read
@@ -47,48 +53,23 @@ jobs:
               NEXT_PUBLIC_APP_API_URI=/api
           - context: server
             image_name: ${{ github.event.repository.name }}-server
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNNER_SPEC || 'ubuntu-latest' }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          # list of Docker images to use as base name for tags
-          images: |
-            ghcr.io/${{ github.repository_owner }}/${{ matrix.image_name }}
-          # generate Docker tags based on the following events/attributes
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha,enable=true,priority=100,prefix=,suffix=,format=short
-            type=raw,value=latest
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Define Variables
-        id: vars
-        run: |
-          echo "::set-output name=version::`echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,'`"
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: ${{ matrix.context }}
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: ${{ matrix.build_args }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+    - uses: mantra-chain-tech/infra-github-actions-mantrachain/docker-buildx-v1@main
+      with:
+        container_repository: ${{ env.REGISTRY }}/${{ matrix.image_name }}
+        build_context: ${{ matrix.context }}
+        build_args: ${{ matrix.build_args }}
+        registry: ${{ env.REGISTRY }}
+        registry_username: ${{ github.actor }}
+        registry_password: ${{ secrets.GITHUB_TOKEN }}
+        arch: ${{ env.BUILD_ARCH}}
+        docker_push: true
+    - name: Failure Notification
+      if: failure()
+      uses: mantra-chain-tech/infra-github-actions-mantrachain/slack-notifications@main
+      env:
+        COMMIT_SHA: echo ${{ github.event.workflow_run.head_sha || github.sha }} | cut -c1-7
+      with:
+        slack_notification_webhook: ${{ secrets.SLACK_WEBHOOK_CICD_NOTIFICATIONS }}
+        slack_message: "*[ERROR!] DOCKER BUILD PROCESS FAILED TO COMPLETE SUCCESSFULLY!!* \n\n`${{ github.actor }}` tried to build docker image for `${{ github.event.repository.name }}`.\n`${{ env.COMMIT_SHA }}` on `${{ github.ref_name }}`. The details at:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

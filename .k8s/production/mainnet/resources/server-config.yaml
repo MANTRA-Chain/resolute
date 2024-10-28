@@ -8,5 +8,5 @@ data:
       {
         "chainId": "mantra-1",
         "restURIs": ["https://api.mantrachain.io:443"]
-      },
+      }
     ]
