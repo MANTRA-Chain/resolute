@@ -24,8 +24,7 @@ const signTransaction = async (
   multisigAddress: string,
   unSignedTxn: Txn,
   walletAddress: string,
-  rpcURLs: string[],
-  toBeBroadcastedCount: number
+  rpcURLs: string[]
 ) => {
   try {
     window.wallet.defaultOptions = {
@@ -48,7 +47,7 @@ const signTransaction = async (
 
     const signerData = {
       accountNumber: multisigAcc?.accountNumber,
-      sequence: multisigAcc?.sequence + toBeBroadcastedCount,
+      sequence: multisigAcc?.sequence,
       chainId: chainID,
     };
 

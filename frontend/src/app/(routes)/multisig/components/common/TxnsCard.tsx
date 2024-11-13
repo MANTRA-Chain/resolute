@@ -40,8 +40,6 @@ export const TxnsCard = ({
   isHistory,
   onViewError,
   allowRepeat,
-  disableBroadcast,
-  isOverview,
 }: {
   txn: Txn;
   currency: Currency;
@@ -51,8 +49,6 @@ export const TxnsCard = ({
   isHistory: boolean;
   onViewError?: (errMsg: string) => void;
   allowRepeat?: boolean;
-  disableBroadcast?: boolean;
-  isOverview?: boolean;
 }) => {
   const dispatch = useAppDispatch();
   const { getChainInfo } = useGetChainInfo();
@@ -212,7 +208,7 @@ export const TxnsCard = ({
         <div className="flex gap-[2px] items-end">
           <span className="text-b1">
             {isHistory || isReadyToBroadcast()
-              ? getTimeDifferenceToFutureDate(txn.signed_at, true)
+              ? getTimeDifferenceToFutureDate(txn.last_updated, true)
               : getTimeDifferenceToFutureDate(txn.created_at, true)}
           </span>
         </div>
@@ -272,8 +268,6 @@ export const TxnsCard = ({
                   threshold={threshold}
                   chainID={chainID}
                   isMember={isMember}
-                  disableBroadcast={disableBroadcast}
-                  isOverview={isOverview}
                 />
               ) : (
                 <SignTxn
@@ -282,7 +276,6 @@ export const TxnsCard = ({
                   isMember={isMember}
                   txId={txn.id}
                   unSignedTxn={txn}
-                  isOverview={isOverview}
                 />
               )}
             </>
@@ -310,12 +303,7 @@ export const TxnsCard = ({
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         title="Delete Transaction"
-        description={
-          'Are you sure you want to delete the transaction?' +
-          (isReadyToBroadcast()
-            ? ' This action will require re-signing any already signed subsequent transactions.'
-            : '')
-        }
+        description=" Are you sure you want to delete the transaction ?"
         onDelete={onDeleteTxn}
         loading={loading === TxStatus.PENDING}
       />

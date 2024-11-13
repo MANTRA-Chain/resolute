@@ -37,7 +37,7 @@ const Transactions = ({
     dispatch(getTxns({ address: multisigAddress, status: status }));
   };
 
-  const txnsCount = useAppSelector((state) => state.multisig.txns.Count);
+  const txnsCount = useAppSelector((state) => state.multisig.txns.Count)
   const txnsStatus = useAppSelector((state) => state.multisig.txns.status);
   const deleteTxnRes = useAppSelector((state) => state.multisig.deleteTxnRes);
   const signTxStatus = useAppSelector(
@@ -172,21 +172,21 @@ const TransactionsFilters = ({
 }: {
   txnsType: string;
   handleTxnsTypeChange: (type: string) => void;
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   txnsCount: any;
 }) => {
+
   const getCount = (option: string) => {
     let count = 0;
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    txnsCount &&
-      txnsCount.forEach((t: any) => {
-        if (t?.computed_status?.toLowerCase() === option.toLowerCase()) {
-          count = t?.count;
-        }
-      });
+     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    txnsCount && txnsCount.forEach((t: any) => {
+      if (t?.computed_status?.toLowerCase() === option.toLowerCase()) {
+        count = t?.count
+      }
+    })
 
-    return count;
-  };
+    return count
+  }
 
   return (
     <div className="flex gap-4 flex-wrap">
@@ -244,19 +244,9 @@ const TransactionsList = ({
     setErrMsg(errMsg);
     setViewErrorDialogOpen(true);
   };
-  const sortedTxns = [...txns].sort((a, b) => {
-    const dateA = new Date(
-      txnsType === 'to-broadcast' ? a.signed_at : a.created_at
-    ).getTime();
-    const dateB = new Date(
-      txnsType === 'to-broadcast' ? b.signed_at : b.created_at
-    ).getTime();
-    return txnsType === 'to-broadcast' ? dateA - dateB : dateB - dateA;
-  });
-
   return (
     <div className="space-y-4">
-      {sortedTxns.map((txn, index) => (
+      {txns.map((txn, index) => (
         <TxnsCard
           key={index}
           txn={txn}
@@ -267,7 +257,6 @@ const TransactionsList = ({
           isHistory={isHistory}
           onViewError={onViewError}
           allowRepeat={txnsType === 'completed'}
-          disableBroadcast={txnsType === 'to-broadcast' && index > 0}
         />
       ))}
       <DialogTxnFailed

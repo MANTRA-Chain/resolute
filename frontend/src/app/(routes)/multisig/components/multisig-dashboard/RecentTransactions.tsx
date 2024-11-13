@@ -111,17 +111,14 @@ const MultisigAccountRecentTxns = ({
             multisigAddress={multisigAddress}
             chainID={chainID}
             isHistory={false}
-            isOverview={true}
           />
         ))}
       </div>
-      {txns?.length > 1 ? (
-        <div className="flex justify-end">
-          <button onClick={handleToggleView} className="secondary-btn">
-            {showAllTxns ? 'View Less' : 'View More'}
-          </button>
-        </div>
-      ) : null}
+      <div className="flex justify-end">
+        <button onClick={handleToggleView} className="secondary-btn">
+          {showAllTxns ? 'View Less' : 'View More'}
+        </button>
+      </div>
     </div>
   );
 };

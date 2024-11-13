@@ -12,7 +12,6 @@ import React, { useEffect } from 'react';
 import { FAILED_TO_BROADCAST_ERROR } from '@/utils/errors';
 import useVerifyAccount from '@/custom-hooks/useVerifyAccount';
 import CustomButton from '@/components/common/CustomButton';
-import { useRouter } from 'next/navigation';
 
 interface BroadCastTxnProps {
   txn: Txn;
@@ -21,33 +20,20 @@ interface BroadCastTxnProps {
   pubKeys: MultisigAddressPubkey[];
   chainID: string;
   isMember: boolean;
-  disableBroadcast?: boolean;
-  isOverview?: boolean;
 }
 
 const BroadCastTxn: React.FC<BroadCastTxnProps> = (props) => {
-  const {
-    txn,
-    multisigAddress,
-    pubKeys,
-    threshold,
-    chainID,
-    isMember,
-    disableBroadcast,
-    isOverview,
-  } = props;
+  const { txn, multisigAddress, pubKeys, threshold, chainID, isMember } = props;
   const dispatch = useAppDispatch();
   const { getChainInfo } = useGetChainInfo();
   const {
     address: walletAddress,
     restURLs: baseURLs,
     rpcURLs,
-    chainName,
   } = getChainInfo(chainID);
   const { isAccountVerified } = useVerifyAccount({
     address: walletAddress,
   });
-  const router = useRouter();
 
   const updateTxnRes = useAppSelector(
     (state: RootState) => state.multisig.updateTxnRes
@@ -92,13 +78,9 @@ const BroadCastTxn: React.FC<BroadCastTxnProps> = (props) => {
     <CustomButton
       btnText="Broadcast"
       btnOnClick={() => {
-        if (isOverview) {
-          router.push(`/multisig/${chainName}/${multisigAddress}`);
-        } else {
-          broadcastTxn();
-        }
+        broadcastTxn();
       }}
-      btnDisabled={!isMember || disableBroadcast}
+      btnDisabled={!isMember}
       btnStyles="w-[115px]"
     />
   );
