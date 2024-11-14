@@ -86,10 +86,15 @@ helmCharts:
         - name: migrate-db
           image: postgres:13
           command:
-            - /usr/bin/psql
-            - postgres://resolute:${userPassword}@postgresql:5432/resolute
-            - -f
-            - /tmp/update_schema.sql
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for postgres to be ready..."
+              while ! pg_isready -h postgresql; do
+                sleep 1
+              done
+              echo "Postgres is ready!"
+              psql postgres://resolute:${userPassword}@postgresql:5432/resolute -f /tmp/update_schema.sql
           volumeMounts:
             - name: resolute-server-update-schema
               mountPath: /tmp/update_schema.sql
