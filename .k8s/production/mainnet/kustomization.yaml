@@ -84,7 +84,7 @@ helmCharts:
     deployment:
       initContainers:
         - name: migrate-db
-          image: alpine/psql:16.3
+          image: postgres:13
           command:
             - /usr/bin/psql
             - postgres://resolute-mainnet:${userPassword}@postgresql:5432/resolute-mainnet
