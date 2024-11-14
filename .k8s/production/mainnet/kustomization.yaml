@@ -6,6 +6,7 @@ resources:
   - resources/server-config.yaml
   - resources/psql-init.yaml
   - secrets/postgresql-database-secret.yaml
+  - ../../common
 
 # enable logging in logs explorer
 labels:
@@ -81,6 +82,21 @@ helmCharts:
           protocol: TCP
           name: http
     deployment:
+      initContainers:
+        - name: migrate-db
+          image: alpine/psql:16.3
+          command:
+            - /usr/bin/psql
+            - postgres://resolute-mainnet:${userPassword}@postgresql:5432/resolute-mainnet
+            - -f
+            - /tmp/update_schema.sql
+          volumeMounts:
+            - name: resolute-server-update-schema
+              mountPath: /tmp/update_schema.sql
+              subPath: update_schema.sql
+          envFrom:
+            - type: secret
+              name: mantra-chain-mainnet-application-resolute-secrets
       image:
         repository: ghcr.io/mantra-chain/resolute-server
         pullPolicy: Always
@@ -110,7 +126,11 @@ helmCharts:
         secret:
           secretName: mantra-chain-mainnet-application-resolute-secrets
           defaultMode: 420
-      
+      - name: resolute-server-update-schema
+        configMap:
+          name: resolute-server-update-schema
+          defaultMode: 420
+
     ingress:
       - enabled: true
         name: api

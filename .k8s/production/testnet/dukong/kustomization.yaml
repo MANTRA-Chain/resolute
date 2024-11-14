@@ -5,6 +5,7 @@ namespace: mantra-dukong-1-applications
 resources:
   - resources/server-config.yaml
   - resources/psql-init.yaml
+  - ../../../common
   # - secrets/resolute-redis-secrets.yaml
 
 # enable logging in logs explorer
@@ -81,6 +82,21 @@ helmCharts:
           protocol: TCP
           name: http
     deployment:
+      initContainers:
+        - name: migrate-db
+          image: alpine/psql:16.3
+          command:
+            - /usr/bin/psql
+            - postgres://resolute:${userPassword}@postgresql:5432/resolute
+            - -f
+            - /tmp/update_schema.sql
+          volumeMounts:
+            - name: resolute-server-update-schema
+              mountPath: /tmp/update_schema.sql
+              subPath: update_schema.sql
+          env:
+            - name: userPassword
+              value: heartland-ocean-praetor-neat
       image:
         repository: ghcr.io/mantra-chain/resolute-server
         pullPolicy: Always
@@ -105,6 +121,10 @@ helmCharts:
       - name: resolute-server-dukong-config
         configMap:
           name: resolute-server-dukong-config
+          defaultMode: 420
+      - name: resolute-server-update-schema
+        configMap:
+          name: resolute-server-update-schema
           defaultMode: 420
       
     ingress:
