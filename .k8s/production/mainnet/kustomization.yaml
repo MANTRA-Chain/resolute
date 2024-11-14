@@ -94,9 +94,9 @@ helmCharts:
             - name: resolute-server-update-schema
               mountPath: /tmp/update_schema.sql
               subPath: update_schema.sql
-          envfrom:
-            - secretRef:
-                name: mantra-chain-mainnet-application-resolute-secrets
+          envFrom:
+            - type: secret
+              name: mantra-chain-mainnet-application-resolute-secrets
       image:
         repository: ghcr.io/mantra-chain/resolute-server
         pullPolicy: Always
