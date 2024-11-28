@@ -1,0 +1,37 @@
+apiVersion: getambassador.io/v3alpha1
+kind: Host
+metadata:
+  name: resolute-sandbox-mantrachain-dev
+  annotations:
+    external-dns.ambassador-service: emissary-ingress.emissary
+spec:
+  hostname: resolute.asia-east2-std.sandbox.mantrachain.dev
+  acmeProvider:
+    authority: none
+  tlsSecret:
+    name: asia-east2-std.sandbox.mantrachain.dev-wildcard-tls-secret
+    namespace: emissary
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: resolute-frontend
+spec:
+  hostname: "resolute.asia-east2-std.sandbox.mantrachain.dev"
+  prefix: /
+  service: resolute-frontend-sandbox:3000
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: resolute-server
+spec:
+  hostname: "resolute.asia-east2-std.sandbox.mantrachain.dev"
+  prefix: '/api(/|$)(.*)'
+  prefix_regex: true
+  regex_rewrite:
+    pattern: '/api(/|$)(.*)'
+    substitution: '/\2'
+  service: resolute-server-sandbox:8000
+  allow_upgrade:
+  - websocket

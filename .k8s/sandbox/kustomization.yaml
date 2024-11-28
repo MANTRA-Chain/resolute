@@ -1,0 +1,218 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: mantra-canary-net-1-applications
+
+resources:
+  - resources/authproxy.yaml
+  - resources/server-config.yaml
+  - resources/psql-init.yaml
+  - resources/host_mapping.yaml
+  - ../common
+  # - secrets/resolute-redis-secrets.yaml
+
+# enable logging in logs explorer
+labels:
+  - pairs:
+      gke.logging.enabled: "true"
+    includeSelectors: false
+    includeTemplates: true
+
+helmCharts:
+#
+# RESOLUTE FRONTEND
+#
+- name: generic-helm-chart
+  repo: https://aaronforce1.github.io/generic-helm-chart
+  version: 0.4.2
+  releaseName: resolute-frontend-sandbox
+  valuesFile: './values.yaml'
+  valuesInline:
+    nameOverride: resolute-frontend-sandbox
+    fullnameOverride: resolute-frontend-sandbox
+    service:
+      port:
+        - port: 3000
+          targetPort: 3000
+          protocol: TCP
+          name: http
+    deployment:
+      image:
+        repository: ghcr.io/mantra-chain/resolute-frontend
+        pullPolicy: Always
+        tag: "mantra-cosmwasm"
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+      service:
+        port:
+          - containerPort: 3000
+            protocol: TCP
+            name: http
+    ingress:
+      - enabled: false
+        name: frontend
+        className: nginx
+        hosts:
+          - host: resolute.dukong.int.mantrachain.io
+            http:
+              paths:
+                - backend:
+                    service:
+                      name: resolute-frontend-sandbox
+                      port:
+                        number: 3000
+                  path: /
+                  pathType: Prefix
+        tls:
+          - hosts:
+              - resolute.dukong.int.mantrachain.io
+            secretName: dukong.int.mantrachain.io-wildcard-tls-secret
+#
+# RESOLUTE SERVER
+#
+- name: generic-helm-chart
+  repo: https://aaronforce1.github.io/generic-helm-chart
+  version: 0.4.2
+  releaseName: resolute-server-sandbox
+  valuesFile: './values.yaml'
+  valuesInline:
+    nameOverride: resolute-server-sandbox
+    fullnameOverride: resolute-server-sandbox
+    serviceAccount:
+      annotations:
+        iam.gke.io/gcp-service-account: mantra-chain-sandbox-sql-op@mantra-chain-sandbox.iam.gserviceaccount.com
+    service:
+      port:
+        - port: 8000
+          targetPort: 1323
+          protocol: TCP
+          name: http
+    deployment:
+      initContainers:
+        - name: migrate-db
+          image: postgres:13
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for postgres to be ready..."
+              while ! pg_isready -h 127.0.0.1; do
+                sleep 1
+              done
+              echo "Postgres is ready!"
+              # echo "initializing base schema..."
+              # psql "host=127.0.0.1 sslmode=disable dbname=resolute user=mantra-chain-sandbox-sql-op@mantra-chain-sandbox.iam" -f /tmp/schema.sql
+              echo "Applying schema updates..."
+              psql "host=127.0.0.1 sslmode=disable dbname=resolute user=mantra-chain-sandbox-sql-op@mantra-chain-sandbox.iam" -f /tmp/update_schema.sql
+          volumeMounts:
+            - name: resolute-server-update-schema
+              mountPath: /tmp/update_schema.sql
+              subPath: update_schema.sql
+            - name: postgresql-init-script
+              mountPath: /tmp/schema.sql
+              subPath: schema.sql
+      image:
+        repository: ghcr.io/mantra-chain/resolute-server
+        pullPolicy: Always
+        tag: "mantra-cosmwasm"
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+      service:
+        port:
+          - containerPort: 1323
+            protocol: TCP
+            name: http
+      
+      volumeMounts:
+      - name: resolute-server-sandbox-config
+        mountPath: /app/config.yaml
+        subPath: config.yaml
+      - name: resolute-server-sandbox-config
+        mountPath: /app/networks.json
+        subPath: networks.json
+      
+      volumes:
+      - name: resolute-server-sandbox-config
+        configMap:
+          name: resolute-server-sandbox-config
+          defaultMode: 420
+      - name: resolute-server-update-schema
+        configMap:
+          name: resolute-server-update-schema
+          defaultMode: 420
+      - name: postgresql-init-script
+        configMap:
+          name: postgresql-init-script
+          defaultMode: 420
+      
+    ingress:
+      - enabled: false
+        name: api
+        className: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/rewrite-target: /$2
+          nginx.ingress.kubernetes.io/use-regex: 'true'
+        hosts:
+          - host: resolute.dukong.int.mantrachain.io
+            http:
+              paths:
+                - backend:
+                    service:
+                      name: resolute-server-sandbox
+                      port:
+                        number: 8000
+                  path: /api(/|$)(.*)
+                  pathType: Prefix
+        tls:
+          - hosts:
+              - resolute.dukong.int.mantrachain.io
+            secretName: dukong.int.mantrachain.io-wildcard-tls-secret
+#
+# Higher Environments: Database should run as cloud-managed service
+#
+########################################################
+## REDIS
+########################################################
+- name: redis
+  repo: oci://registry-1.docker.io/bitnamicharts
+  version: 20.2.1
+  releaseName: resolute-redis-sandbox
+  valuesInline:
+    commonAnnotations:
+      argocd.argoproj.io/sync-wave: "-1"
+    commonLabels:
+      app.kubernetes.io/part-of: resolute-server-sandbox
+      platform/cluster: mantra-sandbox
+      platform/environment: sandbox
+      db-migration: "false"
+
+    image:
+      registry: docker.io
+      repository: redis/redis-stack-server 
+      tag: latest
+
+    commonConfiguration: |-
+      port 6379
+      daemonize no
+      loadmodule /opt/redis-stack/lib/rediscompat.so
+      loadmodule /opt/redis-stack/lib/redisearch.so
+      loadmodule /opt/redis-stack/lib/redistimeseries.so
+      loadmodule /opt/redis-stack/lib/rejson.so
+      loadmodule /opt/redis-stack/lib/redisbloom.so
+      loadmodule /opt/redis-stack/lib/redisgears.so v8-plugin-path /opt/redis-stack/lib/libredisgears_v8_plugin.so
+
+    auth:
+      enabled: false
+      ## TODO: REENABLE THIS ONCE WE UPDATE SERVER.GO TO SUPPORT REDIS AUTH
+      # existingSecret: resolute-redis-secrets
+      # existingSecretPasswordKey: redis-password
+
+    architecture: standalone
+
+    master:
+      resourcesPreset: "nano"
+      #persistence:
+      #  size: 500M
+      persistentVolumeClaimRetentionPolicy:
+        enabled: true
+        whenScaled: Retain
+        whenDeleted: Retain

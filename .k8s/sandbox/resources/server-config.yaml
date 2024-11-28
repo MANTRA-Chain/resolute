@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resolute-server-sandbox-config
+data:
+  config.yaml: |
+    active: "dev"
+
+    # don't remove this prod config as it is used for global config
+    production:
+      api:
+        port: 1323
+      coingecko:
+        uri: "https://api.coingecko.com/api/v3/"
+      redisUri: "resolute-redis-sandbox-master:6379"
+
+    dev:
+      database:
+        host: "127.0.0.1"
+        port: 5432
+        user: "mantra-chain-sandbox-sql-op@mantra-chain-sandbox.iam"
+        password: "xxxx"
+        name: "resolute"
+
+  networks.json: |
+    [
+      {
+        "chainId": "mantra-dukong-1",
+        "restURIs": ["https://api.dukong.mantrachain.io:443"]
+      }
+    ]

@@ -1,0 +1,41 @@
+environment: canary
+cluster: develop
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+commonLabels:
+  app.kubernetes.io/part-of: mantrachain-dukong-resolute
+
+deployment:
+
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  envFrom: []
+  env: {}
+
+  livenessProbe: {}
+  readinessProbe: {}
+
+configMap: {}
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: []
+
+ingress: []
+
+externalSecret:
+  enabled: false
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
