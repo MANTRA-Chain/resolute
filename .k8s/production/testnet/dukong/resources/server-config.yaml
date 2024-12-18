@@ -16,10 +16,10 @@ data:
 
     dev:
       database:
-        host: "postgresql"
+        host: "127.0.0.1"
         port: 5432
-        user: "resolute"
-        password: "heartland-ocean-praetor-neat"
+        user: "mantra-chain-testnet-sql-op@mantra-chain-testnet.iam"
+        password: "xxxx"
         name: "resolute"
 
   networks.json: |

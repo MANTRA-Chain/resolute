@@ -3,8 +3,10 @@ kind: Kustomization
 namespace: mantra-dukong-1-applications
 
 resources:
+  - resources/authproxy.yaml
   - resources/server-config.yaml
   - resources/psql-init.yaml
+  - resources/host_mapping.yaml
   - ../../../common
   # - secrets/resolute-redis-secrets.yaml
 
@@ -46,7 +48,7 @@ helmCharts:
             protocol: TCP
             name: http
     ingress:
-      - enabled: true
+      - enabled: false
         name: frontend
         className: nginx
         hosts:
@@ -75,6 +77,9 @@ helmCharts:
   valuesInline:
     nameOverride: resolute-server-dukong
     fullnameOverride: resolute-server-dukong
+    serviceAccount:
+      annotations:
+        iam.gke.io/gcp-service-account: mantra-chain-testnet-sql-op@mantra-chain-testnet.iam.gserviceaccount.com
     service:
       port:
         - port: 8000
@@ -132,7 +137,7 @@ helmCharts:
           defaultMode: 420
       
     ingress:
-      - enabled: true
+      - enabled: false
         name: api
         className: nginx
         annotations:

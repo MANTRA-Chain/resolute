@@ -1,0 +1,37 @@
+apiVersion: getambassador.io/v3alpha1
+kind: Host
+metadata:
+  name: resolute-dukong-init-mantrachain-io
+  annotations:
+    external-dns.ambassador-service: emissary-ingress.emissary
+spec:
+  hostname: resolute.dukong.int.mantrachain.io
+  acmeProvider:
+    authority: none
+  tlsSecret:
+    name: dukong.int.mantrachain.io-wildcard-tls-secret
+    namespace: emissary
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: resolute-frontend
+spec:
+  hostname: "resolute.dukong.int.mantrachain.io"
+  prefix: /
+  service: resolute-frontend-dukong:3000
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: resolute-server
+spec:
+  hostname: "resolute.dukong.int.mantrachain.io"
+  prefix: '/api(/|$)(.*)'
+  prefix_regex: true
+  regex_rewrite:
+    pattern: '/api/?(.*)'
+    substitution: '/\1'
+  service: resolute-server-dukong:8000
+  allow_upgrade:
+  - websocket
