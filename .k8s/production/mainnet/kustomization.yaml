@@ -3,8 +3,10 @@ kind: Kustomization
 namespace: mantra-1-applications
 
 resources:
+  - resources/authproxy.yaml
   - resources/server-config.yaml
   - resources/psql-init.yaml
+  - resources/host_mapping.yaml
   - secrets/postgresql-database-secret.yaml
   - ../../common
 
@@ -46,7 +48,7 @@ helmCharts:
             protocol: TCP
             name: http
     ingress:
-      - enabled: true
+      - enabled: false
         name: frontend
         className: nginx
         hosts:
@@ -75,6 +77,9 @@ helmCharts:
   valuesInline:
     nameOverride: resolute-server-mainnet
     fullnameOverride: resolute-server-mainnet
+    serviceAccount:
+      annotations:
+        iam.gke.io/gcp-service-account: mantra-chain-mainnet-sql-op@mantra-chain-mainnet.iam.gserviceaccount.com
     service:
       port:
         - port: 8000
@@ -137,7 +142,7 @@ helmCharts:
           defaultMode: 420
 
     ingress:
-      - enabled: true
+      - enabled: false
         name: api
         className: nginx
         annotations:

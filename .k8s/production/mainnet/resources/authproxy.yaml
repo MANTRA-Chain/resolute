@@ -1,0 +1,13 @@
+apiVersion: cloudsql.cloud.google.com/v1
+kind: AuthProxyWorkload
+metadata:
+  name: authproxyworkload-resolute
+spec:
+  workloadSelector:
+    kind: "Deployment"
+    name: "resolute-server-mainnet"
+  instances:
+  - connectionString: "mantra-chain-mainnet:asia-east2:mantra-chain-mainnet-asia-east2-resolute"
+    port: 5432
+    privateIP: true
+    autoIAMAuthN: true
