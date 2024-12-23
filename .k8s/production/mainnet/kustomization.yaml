@@ -95,11 +95,11 @@ helmCharts:
             - -c
             - |
               echo "Waiting for postgres to be ready..."
-              while ! pg_isready -h postgresql; do
+              while ! pg_isready -h localhost; do
                 sleep 1
               done
               echo "Postgres is ready!"
-              psql postgres://resolute-mainnet:${userPassword}@postgresql:5432/resolute-mainnet -f /tmp/update_schema.sql
+              psql postgres://mantra-chain-mainnet-sql-op%40mantra-chain-mainnet.iam:@localhost:5432/resolute -f /tmp/update_schema.sql
           volumeMounts:
             - name: resolute-server-update-schema
               mountPath: /tmp/update_schema.sql
