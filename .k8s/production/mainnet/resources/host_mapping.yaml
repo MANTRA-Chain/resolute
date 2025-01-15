@@ -9,7 +9,7 @@ spec:
   acmeProvider:
     authority: none
   tlsSecret:
-    name: int.asia-east2-std.mantrachain.io-wildcard-tls-secret
+    name: int.asia-east2-std.mantrachain.io-wildcard-tls
     namespace: emissary
 ---
 apiVersion: getambassador.io/v3alpha1
