@@ -199,7 +199,7 @@ helmCharts:
         scriptsConfigMap: postgresql-init-script
       configuration: |-
         max_connections = 500
-        shared_buffers = 500MB
+        shared_buffers = 50MB
         listen_addresses = '*'
       resources:
         requests:
