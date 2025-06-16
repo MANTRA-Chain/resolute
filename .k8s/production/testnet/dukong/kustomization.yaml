@@ -47,6 +47,13 @@ helmCharts:
           - containerPort: 3000
             protocol: TCP
             name: http
+      resources:
+        requests:
+          cpu: 50m
+          memory: 350Mi
+        limits:
+          cpu: 150m
+          memory: 1Gi
     ingress:
       - enabled: false
         name: frontend
@@ -117,6 +124,13 @@ helmCharts:
           - containerPort: 1323
             protocol: TCP
             name: http
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 150m
+          memory: 256Mi
       
       volumeMounts:
       - name: resolute-server-dukong-config
@@ -187,6 +201,13 @@ helmCharts:
         max_connections = 500
         shared_buffers = 500MB
         listen_addresses = '*'
+      resources:
+        limits:
+          cpu: 50m
+          memory: 100Mi
+        requests:
+          cpu: 200m
+          memory: 500Mi
 #
 # Higher Environments: Database should run as cloud-managed service
 #
