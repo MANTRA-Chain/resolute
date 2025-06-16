@@ -202,10 +202,10 @@ helmCharts:
         shared_buffers = 500MB
         listen_addresses = '*'
       resources:
-        limits:
+        requests:
           cpu: 50m
           memory: 100Mi
-        requests:
+        limits:
           cpu: 200m
           memory: 500Mi
 #
