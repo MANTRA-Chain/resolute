@@ -5,7 +5,6 @@ namespace: mantra-dukong-1-applications
 resources:
   - resources/authproxy.yaml
   - resources/server-config.yaml
-  - resources/psql-init.yaml
   - resources/host_mapping.yaml
   - ../../../common
   # - secrets/resolute-redis-secrets.yaml
@@ -172,42 +171,7 @@ helmCharts:
           - hosts:
               - resolute.dukong.int.mantrachain.io
             secretName: dukong.int.mantrachain.io-wildcard-tls-secret
-#
-# Higher Environments: Database should run as cloud-managed service
-#
-########################################################
-## POSTGRES
-########################################################
-- name: postgresql
-  repo: https://charts.bitnami.com/bitnami
-  version: 13.3.1
-  releaseName: postgresql
-  namespace: mantra-dukong-1-applications
-  valuesInline:
-    commonAnnotations:
-      argocd.argoproj.io/sync-wave: "-1"
 
-    global:
-      postgresql:
-        auth:
-          database: resolute
-          username: resolute
-          password: heartland-ocean-praetor-neat
-
-    primary:
-      initdb:
-        scriptsConfigMap: postgresql-init-script
-      configuration: |-
-        max_connections = 500
-        shared_buffers = 50MB
-        listen_addresses = '*'
-      resources:
-        requests:
-          cpu: 50m
-          memory: 100Mi
-        limits:
-          cpu: 200m
-          memory: 500Mi
 #
 # Higher Environments: Database should run as cloud-managed service
 #
