@@ -5,9 +5,7 @@ namespace: mantra-1-applications
 resources:
   - resources/authproxy.yaml
   - resources/server-config.yaml
-  - resources/psql-init.yaml
   - resources/host_mapping.yaml
-  - secrets/postgresql-database-secret.yaml
   - ../../common
 
 # enable logging in logs explorer
@@ -163,39 +161,7 @@ helmCharts:
           - hosts:
               - resolute.int.mantrachain.io
             secretName: int.asia-east2-std.mantrachain.io-wildcard-tls
-#
-# Higher Environments: Database should run as cloud-managed service
-#
-########################################################
-## POSTGRES
-########################################################
-- name: postgresql
-  repo: https://charts.bitnami.com/bitnami
-  version: 16.0.1
-  releaseName: postgresql
-  namespace: mantra-mainnet-1-applications
-  valuesInline:
-    commonAnnotations:
-      argocd.argoproj.io/sync-wave: "-1"
 
-    global:
-      postgresql:
-        auth:
-          database: resolute-mainnet
-          username: resolute-mainnet
-          existingSecret: mantra-chain-mainnet-application-resolute-secrets
-          secretKeys:
-            adminPasswordKey: "adminPassword"
-            userPasswordKey: "userPassword"
-            replicationPasswordKey: "replicationPassword"
-
-    primary:
-      initdb:
-        scriptsConfigMap: postgresql-init-script
-      configuration: |-
-        max_connections = 500
-        shared_buffers = 500MB
-        listen_addresses = '*'
 #
 # Higher Environments: Database should run as cloud-managed service
 #
