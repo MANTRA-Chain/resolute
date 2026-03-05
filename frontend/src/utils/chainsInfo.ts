@@ -14,9 +14,9 @@ export const networks: Network[] = [
     },
     showAirdrop: false,
     logos: {
-      menu: 'https://staging-app.mantra.finance/assets/mantra-logo.c2e024c1.svg',
+      menu: 'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/mantra/om.png',
       toolbar:
-        'https://staging-app.mantra.finance/assets/mantra-logo.c2e024c1.svg',
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/mantra/om.png',
     },
     supportedWallets: [KEPLR, LEAP, COSMOSTATION],
     keplrExperimental: false,
@@ -42,9 +42,9 @@ export const networks: Network[] = [
       },
       currencies: [
         {
-          coinDenom: 'OM',
-          coinMinimalDenom: 'uom',
-          coinDecimals: 6,
+          coinDenom: 'MANTRA',
+          coinMinimalDenom: 'amantra',
+          coinDecimals: 18,
         },
         {
           coinDenom: 'ATOM',
@@ -154,13 +154,13 @@ export const networks: Network[] = [
       ],
       feeCurrencies: [
         {
-          coinDenom: 'OM',
-          coinMinimalDenom: 'uom',
-          coinDecimals: 6,
+          coinDenom: 'MANTRA',
+          coinMinimalDenom: 'amantra',
+          coinDecimals: 18,
           gasPriceStep: {
-            low: 0.01,
-            average: 0.015,
-            high: 0.02,
+            low: 0.00000004,
+            average: 0.00000008,
+            high: 0.00000012
           },
         },
       ],
@@ -168,12 +168,12 @@ export const networks: Network[] = [
         coinType: 118,
       },
       stakeCurrency: {
-        coinDenom: 'OM',
-        coinMinimalDenom: 'uom',
-        coinDecimals: 6,
+        coinDenom: 'MANTRA',
+        coinMinimalDenom: 'amantra',
+        coinDecimals: 18,
       },
       image:
-        'https://staging-app.mantra.finance/assets/mantra-logo.c2e024c1.svg',
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/mantra/om.png',
       theme: {
         primaryColor: '#fff',
         gradient:
@@ -194,9 +194,9 @@ export const networks: Network[] = [
     },
     showAirdrop: false,
     logos: {
-      menu: 'https://staging-app.mantra.finance/assets/mantra-logo.c2e024c1.svg',
+      menu: 'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/mantra/om.png',
       toolbar:
-        'https://staging-app.mantra.finance/assets/mantra-logo.c2e024c1.svg',
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/mantra/om.png',
     },
     supportedWallets: [KEPLR, LEAP, COSMOSTATION],
     keplrExperimental: false,
@@ -222,9 +222,9 @@ export const networks: Network[] = [
       },
       currencies: [
         {
-          coinDenom: 'OM',
-          coinMinimalDenom: 'uom',
-          coinDecimals: 6,
+          coinDenom: 'MANTRA',
+          coinMinimalDenom: 'amantra',
+          coinDecimals: 18,
         },
         {
           coinDenom: 'ATOM',
@@ -334,13 +334,13 @@ export const networks: Network[] = [
       ],
       feeCurrencies: [
         {
-          coinDenom: 'OM',
-          coinMinimalDenom: 'uom',
-          coinDecimals: 6,
+          coinDenom: 'MANTRA',
+          coinMinimalDenom: 'amantra',
+          coinDecimals: 18,
           gasPriceStep: {
-            low: 0.01,
-            average: 0.015,
-            high: 0.02,
+            low: 0.00000004,
+            average: 0.00000008,
+            high: 0.00000012
           },
         },
       ],
@@ -348,12 +348,12 @@ export const networks: Network[] = [
         coinType: 118,
       },
       stakeCurrency: {
-        coinDenom: 'OM',
-        coinMinimalDenom: 'uom',
-        coinDecimals: 6,
+        coinDenom: 'MANTRA',
+        coinMinimalDenom: 'amantra',
+        coinDecimals: 18,
       },
       image:
-        'https://staging-app.mantra.finance/assets/mantra-logo.c2e024c1.svg',
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/mantra/om.png',
       theme: {
         primaryColor: '#fff',
         gradient:
