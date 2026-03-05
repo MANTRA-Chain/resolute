@@ -158,9 +158,9 @@ export const networks: Network[] = [
           coinMinimalDenom: 'amantra',
           coinDecimals: 18,
           gasPriceStep: {
-            low: 0.00000004,
-            average: 0.00000008,
-            high: 0.00000012
+            low: 0.04,
+            average: 0.05,
+            high: 0.06
           },
         },
       ],
@@ -338,9 +338,9 @@ export const networks: Network[] = [
           coinMinimalDenom: 'amantra',
           coinDecimals: 18,
           gasPriceStep: {
-            low: 0.00000004,
-            average: 0.00000008,
-            high: 0.00000012
+            low: 0.04,
+            average: 0.05,
+            high: 0.06
           },
         },
       ],
