@@ -14,7 +14,7 @@ const Overview = () => {
   const params = useParams();
   const paramChains = params.chainNames;
   const chainNames =
-    typeof paramChains === 'string' ? [paramChains] : paramChains;
+    typeof paramChains === 'string' ? [paramChains] : (paramChains ?? []);
   const nameToChainIDs = useAppSelector(
     (state: RootState) => state.wallet.nameToChainIDs
   );

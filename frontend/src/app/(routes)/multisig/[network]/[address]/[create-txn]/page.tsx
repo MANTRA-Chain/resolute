@@ -2,11 +2,16 @@ import React from 'react';
 import PageTxnBuilder from './PageTxnBuilder';
 import '../../../multisig.css';
 
-const page = ({ params }: { params: { network: string; address: string } }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ network: string; address: string }>;
+}) => {
+  const { network, address } = await params;
   return (
     <PageTxnBuilder
-      paramChain={params.network.toLowerCase()}
-      multisigAddress={params.address}
+      paramChain={network.toLowerCase()}
+      multisigAddress={address}
     />
   );
 };

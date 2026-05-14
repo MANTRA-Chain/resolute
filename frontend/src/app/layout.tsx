@@ -4,15 +4,9 @@ import { StoreProvider } from '@/store/StoreProvider';
 import SnackBar from '@/components/SnackBar';
 import Script from 'next/script';
 import { OpenGraph } from 'next/dist/lib/metadata/types/opengraph-types';
-import dynamic from 'next/dynamic';
-import Loading from '@/components/main-layout/Loading';
+import ClientFixedLayout from '@/components/main-layout/ClientFixedLayout';
 
 const TRACKING_ID = 'G-RTXGXXDNNS';
-
-const FixedLayout = dynamic(
-  () => import('@/components/main-layout/FixedLayout'),
-  { ssr: false, loading: () => <Loading /> }
-);
 
 const openGraph: OpenGraph = {
   title: 'Interchain interface',
@@ -43,7 +37,7 @@ export default function RootLayout({
           <StoreProvider>
             <div className="layout">
               <SnackBar />
-              <FixedLayout>{children}</FixedLayout>
+              <ClientFixedLayout>{children}</ClientFixedLayout>
             </div>
           </StoreProvider>
         }

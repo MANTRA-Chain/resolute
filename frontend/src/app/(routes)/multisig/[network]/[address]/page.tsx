@@ -2,12 +2,17 @@ import React from 'react';
 import '../../multisig.css';
 import PageMultisigInfo from '../../components/multisig-account/PageMultisigInfo';
 
-const page = ({ params }: { params: { network: string; address: string } }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ network: string; address: string }>;
+}) => {
+  const { network, address } = await params;
   return (
     <div>
       <PageMultisigInfo
-        paramChain={params.network.toLowerCase()}
-        paramAddress={params.address}
+        paramChain={network.toLowerCase()}
+        paramAddress={address}
       />
     </div>
   );

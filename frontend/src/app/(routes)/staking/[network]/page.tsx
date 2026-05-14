@@ -1,18 +1,17 @@
-'use client';
-
 import React from 'react';
 import '../staking.css';
 import SingleChain from './SingleChain';
 // import ChainStaking from './ChainStaking';
 
-const page = ({
+const page = async ({
   params,
   // searchParams,
 }: {
-  params: { network: string };
+  params: Promise<{ network: string }>;
   // searchParams?: { [key: string]: string | undefined };
 }) => {
-  const { network: paramChain } = params;
+  const resolvedParams = await params;
+  const { network: paramChain } = resolvedParams;
 
   return <SingleChain paramChain={paramChain} />;
   // return <ChainStaking paramChain={paramChain} queryParams={searchParams} />;

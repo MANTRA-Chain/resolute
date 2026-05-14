@@ -10,7 +10,7 @@ const Page = () => {
   const params = useParams();
   const paramChains = params.chainNames;
   const chainNames =
-    typeof paramChains === 'string' ? [paramChains] : paramChains;
+    typeof paramChains === 'string' ? [paramChains] : (paramChains ?? []);
 
   return <Transfers chainNames={chainNames} />;
 };
