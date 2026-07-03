@@ -9,6 +9,9 @@ resources:
   - ../../../common
   # - secrets/resolute-redis-secrets.yaml
 
+generatorOptions:
+  disableNameSuffixHash: true
+
 # enable logging in logs explorer
 labels:
   - pairs:
