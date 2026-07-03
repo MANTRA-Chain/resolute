@@ -11,7 +11,9 @@ const Page = () => {
   const params = useParams();
   const paramChains = params.network;
   const chainNames =
-    typeof paramChains === 'string' ? [paramChains.toLowerCase()] : paramChains;
+    typeof paramChains === 'string'
+      ? [paramChains.toLowerCase()]
+      : (paramChains ?? []);
   const nameToChainIDs = useAppSelector((state) => state.common.nameToChainIDs);
   const chainIDs: string[] = [];
   Object.keys(nameToChainIDs).forEach((chain) => {

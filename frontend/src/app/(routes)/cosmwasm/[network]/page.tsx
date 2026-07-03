@@ -2,7 +2,12 @@ import React from 'react';
 import '../cosmwasm.css';
 import ChainContracts from './ChainContracts';
 
-const page = ({ params: { network } }: { params: { network: string } }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ network: string }>;
+}) => {
+  const { network } = await params;
   return <ChainContracts network={network} />;
 };
 

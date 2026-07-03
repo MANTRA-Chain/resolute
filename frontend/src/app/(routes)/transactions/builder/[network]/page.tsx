@@ -2,7 +2,12 @@ import React from 'react';
 import '@/app/(routes)/multiops/multiops.css';
 import PageMultiops from './PageMultiops';
 
-const page = ({ params: { network } }: { params: { network: string } }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ network: string }>;
+}) => {
+  const { network } = await params;
   return <PageMultiops paramChain={network} />;
 };
 

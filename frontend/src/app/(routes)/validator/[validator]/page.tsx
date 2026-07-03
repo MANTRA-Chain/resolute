@@ -4,8 +4,13 @@ import '../../staking/staking.css';
 import { VITWIT_NEW_MONIKER, VITWIT_VALIDATOR_NAMES } from '@/utils/constants';
 import ValidatorProfile from './ValidatorProfile';
 
-const page = ({ params }: { params: { validator: string } }) => {
-  const decodedMonikerName = decodeURIComponent(params.validator);
+const page = async ({
+  params,
+}: {
+  params: Promise<{ validator: string }>;
+}) => {
+  const { validator } = await params;
+  const decodedMonikerName = decodeURIComponent(validator);
   // If the moniker name is vitwit or vitwit (previously witval) or witval use new moniker name
   const isVitwitValidator = VITWIT_VALIDATOR_NAMES.includes(
     decodedMonikerName.toLowerCase()

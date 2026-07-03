@@ -13,7 +13,8 @@ const Page = () => {
   const params = useParams();
   const paramHash = params.hash;
 
-  const paramTxHash = typeof paramHash === 'string' ? [paramHash] : paramHash;
+  const paramTxHash =
+    typeof paramHash === 'string' ? [paramHash] : (paramHash ?? []);
 
   const nameToChainsIDs = useAppSelector(
     (state: RootState) => state.common.nameToChainIDs
@@ -22,7 +23,7 @@ const Page = () => {
   const paramChains = params.network;
 
   const arrChainNames =
-    typeof paramChains === 'string' ? [paramChains] : paramChains;
+    typeof paramChains === 'string' ? [paramChains] : (paramChains ?? []);
 
   const chainID = nameToChainsIDs[arrChainNames[0]];
 
