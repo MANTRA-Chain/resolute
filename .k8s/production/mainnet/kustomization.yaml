@@ -8,6 +8,9 @@ resources:
   - resources/host_mapping.yaml
   - ../../common
 
+generatorOptions:
+  disableNameSuffixHash: true
+
 # enable logging in logs explorer
 labels:
   - pairs:
