@@ -5,3 +5,6 @@ configMapGenerator:
   - name: resolute-server-update-schema
     files:
     - update_schema.sql
+
+generatorOptions:
+  disableNameSuffixHash: true
