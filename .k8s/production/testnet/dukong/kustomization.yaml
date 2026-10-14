@@ -12,6 +12,18 @@ resources:
 generatorOptions:
   disableNameSuffixHash: true
 
+# master.count: 0 in the redis chart drops the StatefulSet, Service and PDB from
+# the render, so replicas are patched on the rendered StatefulSet instead.
+# whenScaled: Retain keeps the master PVC while replicas is 0.
+patches:
+  - target:
+      kind: StatefulSet
+      name: resolute-redis-dukong-master
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 0
+
 # enable logging in logs explorer
 labels:
   - pairs:
@@ -38,6 +50,8 @@ helmCharts:
           protocol: TCP
           name: http
     deployment:
+      # Rendered as spec.replicas only while autoscaling.enabled=false (values.yaml)
+      replicaCount: 0
       image:
         repository: ghcr.io/mantra-chain/resolute-frontend
         pullPolicy: Always
@@ -96,6 +110,8 @@ helmCharts:
           protocol: TCP
           name: http
     deployment:
+      # Rendered as spec.replicas only while autoscaling.enabled=false (values.yaml)
+      replicaCount: 0
       initContainers:
         - name: migrate-db
           image: postgres:13
